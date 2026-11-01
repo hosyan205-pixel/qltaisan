@@ -20,8 +20,8 @@ namespace DoAn.Areas.Admin.Controllers
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                query = query.Where(x => x.TK_TenDangNhap.Contains(keyword) ||
-                    x.TK_HoTen.Contains(keyword) || (x.TK_Email != null && x.TK_Email.Contains(keyword)));
+                query = query.Where(x => x.TK_TenDangNhap.Contains(keyword) || x.TK_HoTen.Contains(keyword) || 
+                (x.TK_Email != null && x.TK_Email.Contains(keyword)));
             }
 
             if (!string.IsNullOrWhiteSpace(vaiTro))
@@ -74,7 +74,9 @@ namespace DoAn.Areas.Admin.Controllers
                     return View(tk);
                 }
             }
+
             tk.TK_NgayTao = DateTime.Now;
+            tk.TK_MatKhau = BCrypt.Net.BCrypt.HashPassword(tk.TK_MatKhau);
 
             _context.TaiKhoans.Add(tk);
             await _context.SaveChangesAsync();
@@ -152,8 +154,7 @@ namespace DoAn.Areas.Admin.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var tk = await _context.TaiKhoans
-                .FirstOrDefaultAsync(x => x.TK_ID == id);
+            var tk = await _context.TaiKhoans.FirstOrDefaultAsync(x => x.TK_ID == id);
 
             if (tk == null)
                 return NotFound();

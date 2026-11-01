@@ -18,9 +18,8 @@
             <div class="card-body p-4">
 
                 <form asp-area="Admin" asp-controller="TaiKhoan" asp-action="Create" method="post">
-
                     @Html.AntiForgeryToken()
-
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <div class="row g-3">
 
                         <div class="col-md-6">

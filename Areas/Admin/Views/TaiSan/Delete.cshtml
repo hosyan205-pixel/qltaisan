@@ -1,0 +1,21 @@
+@model Tbltaisan
+@{ ViewData["Title"] = "Xóa tài sản"; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>Xóa tài sản</h1></div>
+    <div class="card"><div class="card-body"><h2 class="card-title">Xác nhận xóa tài sản</h2>
+        <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+        @if (ViewBag.HasHistory == true)
+        {
+            <div class="alert alert-warning">Tài sản đã phát sinh nghiệp vụ nên không thể xóa.</div>
+        }
+        else
+        {
+            <div class="alert alert-danger">Bạn có chắc chắn muốn xóa tài sản @Model.TsMaTaiSan – @Model.TsTenTaiSan? Thao tác này không thể hoàn tác.</div>
+        }
+        <partial name="_ThongTin" model="Model" />
+        <form asp-action="Delete" asp-route-id="@Model.TsId" method="post">
+            @if (ViewBag.HasHistory != true) { <button type="submit" class="btn btn-danger">Xác nhận xóa</button> }
+            <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+        </form>
+    </div></div>
+</main>

@@ -6,6 +6,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Services.AddDbContext<DoAn.Data.DataContext>(options => options.UseMySql(
+    connection, new MySqlServerVersion(new Version(8, 0, 0))));
+
 builder.Services.AddDbContext<DataContext>(options => options.UseMySql(
     builder.Configuration.GetConnectionString("DefaultConnection"),
     new MySqlServerVersion(new Version(8, 0, 0))

@@ -1,0 +1,19 @@
+@using DoAn.Areas.Admin.Models
+@model AssetCreateViewModel
+@{ ViewData["Title"] = "Thêm tài sản"; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>Thêm tài sản</h1><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a asp-action="Index">Quản lý tài sản</a></li><li class="breadcrumb-item active">Thêm tài sản</li></ol></nav></div>
+    <div class="card"><div class="card-body">
+        <h2 class="card-title">Thông tin tài sản mới</h2>
+        <form asp-action="Create" method="post" class="row g-3">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            <div class="col-md-6">
+                <label asp-for="Ma" class="form-label"></label><input asp-for="Ma" class="form-control" maxlength="30" required />
+                <span asp-validation-for="Ma" class="text-danger"></span>
+            </div>
+            <div class="col-md-6"><p class="form-label">Trạng thái ban đầu</p><span class="badge bg-secondary">Chưa cấp phát</span></div>
+            <partial name="Form" model="Model" />
+            <div class="col-12"><button type="submit" class="btn btn-primary">Lưu tài sản</button> <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a></div>
+        </form>
+    </div></div>
+</main>

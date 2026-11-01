@@ -1,0 +1,17 @@
+@using DoAn.Areas.Admin.Models
+@using DoAn.Services.Assets
+@model AssetEditViewModel
+@{ ViewData["Title"] = "Sửa tài sản"; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>Sửa tài sản</h1><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a asp-action="Index">Quản lý tài sản</a></li><li class="breadcrumb-item active">@Model.Ma</li></ol></nav></div>
+    <div class="card"><div class="card-body">
+        <h2 class="card-title">Thông tin tài sản</h2>
+        <form asp-action="Edit" asp-route-id="@Model.AssetId" method="post" class="row g-3">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            <div class="col-md-6"><label for="asset-code" class="form-label">Mã tài sản</label><input id="asset-code" value="@Model.Ma" class="form-control" readonly /><div class="form-text">Mã tài sản được giữ cố định sau khi tạo.</div></div>
+            <div class="col-md-6"><p class="form-label">Trạng thái hiện tại</p><span class="badge @AssetStatuses.Badge(Model.TrangThai)">@AssetDisplay.Label(AssetStatuses.Labels, Model.TrangThai)</span><div class="form-text">Trạng thái được cập nhật bởi nghiệp vụ cấp phát, bảo trì và thanh lý.</div></div>
+            <partial name="Form" model="Model" />
+            <div class="col-12"><button type="submit" class="btn btn-primary">Lưu thay đổi</button> <a asp-action="Details" asp-route-id="@Model.AssetId" class="btn btn-outline-secondary">Quay lại</a></div>
+        </form>
+    </div></div>
+</main>

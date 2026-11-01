@@ -11,6 +11,15 @@
             </a>
         </li>
 
+        @if (!Model.Any(m => string.Equals(m.ControllerName, "TaiSan", StringComparison.OrdinalIgnoreCase)))
+        {
+            <li class="nav-item">
+                <a class="nav-link collapsed" asp-area="Admin" asp-controller="TaiSan" asp-action="Index">
+                    <i class="bi bi-box-seam"></i><span>Quản lý tài sản</span>
+                </a>
+            </li>
+        }
+
         @foreach (var item in Model.Where(m => m.ItemLevel == 1).OrderBy(m => m.ItemOrder))
         {
             var sMenu = Model.Where(m => m.ParentLevel == item.AdminMenuID)

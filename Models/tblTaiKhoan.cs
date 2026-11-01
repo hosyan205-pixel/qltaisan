@@ -1,31 +1,33 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
 
-namespace DoAn.Models
+namespace DoAn.Models;
+
+public partial class Tbltaikhoan
 {
-    [Table("tblTaiKhoan")]
-    public class tblTaiKhoan
-    {
-        [Key]
-        public int TK_ID { get; set; }
+    public int TkId { get; set; }
 
-        [Required, StringLength(50)]
-        [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Tên đăng nhập ko được có dấu hoặc có cách!")]
-        public string TK_TenDangNhap { get; set; } = string.Empty;
+    public string TkTenDangNhap { get; set; } = null!;
 
-        public string TK_MatKhau { get; set; } = string.Empty;
+    public string TkMatKhau { get; set; } = null!;
 
-        [Required, StringLength(100)]
-        public string TK_HoTen { get; set; } = string.Empty;
+    public string TkHoTen { get; set; } = null!;
 
-        public string? TK_Email { get; set; }
+    public string? TkEmail { get; set; }
 
-        public string? TK_SoDienThoai { get; set; }
+    public string? TkSoDienThoai { get; set; }
 
-        public string TK_VaiTro { get; set; } = "NhanVien";
+    public string TkVaiTro { get; set; } = null!;
 
-        public bool TK_TrangThai { get; set; } = true;
+    public bool? TkTrangThai { get; set; }
 
-        public DateTime TK_NgayTao { get; set; } = DateTime.Now;
-    }
+    public DateTime TkNgayTao { get; set; }
+
+    public virtual ICollection<Tblbaotritaisan> Tblbaotritaisans { get; set; } = new List<Tblbaotritaisan>();
+
+    public virtual ICollection<Tblcapphattaisan> Tblcapphattaisans { get; set; } = new List<Tblcapphattaisan>();
+
+    public virtual ICollection<Tblkiemketaisan> Tblkiemketaisans { get; set; } = new List<Tblkiemketaisan>();
+
+    public virtual ICollection<Tblthanhlytaisan> Tblthanhlytaisans { get; set; } = new List<Tblthanhlytaisan>();
 }

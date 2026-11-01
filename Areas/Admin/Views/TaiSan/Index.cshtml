@@ -1,0 +1,108 @@
+@using DoAn.Areas.Admin.Models
+@using DoAn.Services.Assets
+@model TaiSanIndex
+@{ ViewData["Title"] = "Quản lý tài sản"; }
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý tài sản</h1>
+        <nav><ol class="breadcrumb"><li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li><li class="breadcrumb-item active">Tài sản</li></ol></nav>
+    </div>
+    @if (TempData["Success"] is string message)
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    <section class="section">
+        <div class="card"><div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h2 class="card-title mb-0">Danh sách tài sản</h2>
+                <a asp-action="Create" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Thêm tài sản</a>
+            </div>
+            <form method="get" asp-action="Index" class="row g-3 mb-4">
+                <input type="hidden" name="page" value="@Model.Page" />
+                <div class="col-md-6 col-xl-3">
+                    <label asp-for="Keyword" class="form-label">Mã hoặc tên tài sản</label>
+                    <input asp-for="Keyword" class="form-control" placeholder="Nhập từ khóa..." />
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <label asp-for="DanhMucId" class="form-label">Danh mục</label>
+                    <select asp-for="DanhMucId" asp-items="Model.DanhMucs" class="form-select"><option value="">Tất cả danh mục</option></select>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <label asp-for="TinhTrang" class="form-label">Tình trạng</label>
+                    <select asp-for="TinhTrang" class="form-select">
+                        <option value="">Tất cả tình trạng</option>
+                        @foreach (var item in AssetConditions.Labels) { <option value="@item.Key">@item.Value</option> }
+                    </select>
+                </div>
+                <div class="col-md-6 col-xl-3">
+                    <label asp-for="TrangThai" class="form-label">Trạng thái</label>
+                    <select asp-for="TrangThai" class="form-select">
+                        <option value="">Tất cả trạng thái</option>
+                        @foreach (var item in AssetStatuses.Labels) { <option value="@item.Key">@item.Value</option> }
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label asp-for="Sort" class="form-label">Sắp xếp</label>
+                    <select asp-for="Sort" class="form-select">
+                        @foreach (var item in AssetQueries.Sorts) { <option value="@item.Key">@item.Value</option> }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label asp-for="PageSize" class="form-label">Số tài sản mỗi trang</label>
+                    <select asp-for="PageSize" class="form-select"><option value="10">10</option><option value="20">20</option><option value="50">50</option></select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end gap-2">
+                    <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Đặt lại</a>
+                </div>
+            </form>
+            <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+                <span><strong>@Model.Total</strong> tài sản phù hợp</span>
+                <span>Tổng nguyên giá: <strong>@AssetDisplay.Money(Model.TongNguyenGia)</strong></span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>Mã tài sản</th><th>Tên tài sản</th><th>Danh mục</th><th class="text-end">Nguyên giá</th><th>Tình trạng</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+                    <tbody>
+                        @if (!Model.Items.Any())
+                        {
+                            <tr><td colspan="7" class="text-center text-muted py-5">Không tìm thấy tài sản. Hãy thêm tài sản hoặc thay đổi bộ lọc.</td></tr>
+                        }
+                        @foreach (var asset in Model.Items)
+                        {
+                            <tr>
+                                <td><a asp-action="Details" asp-route-id="@asset.TsId">@asset.TsMaTaiSan</a></td>
+                                <td>@asset.TsTenTaiSan</td><td>@asset.Dmts.DmtsTenDanhMuc</td>
+                                <td class="text-end text-nowrap">@AssetDisplay.Money(asset.TsNguyenGia)</td>
+                                <td>@AssetDisplay.Label(AssetConditions.Labels, AssetConditions.Normalize(asset.TsTinhTrang))</td>
+                                <td><span class="badge @AssetStatuses.Badge(asset.TsTrangThai)">@AssetDisplay.Label(AssetStatuses.Labels, asset.TsTrangThai)</span></td>
+                                <td class="text-nowrap">
+                                    <a asp-action="Details" asp-route-id="@asset.TsId" class="btn btn-sm btn-outline-primary">Xem</a>
+                                    <a asp-action="Edit" asp-route-id="@asset.TsId" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                                    <a asp-action="Delete" asp-route-id="@asset.TsId" class="btn btn-sm btn-outline-danger">Xóa</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <nav aria-label="Phân trang tài sản" class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span>Trang @Model.Page / @Model.TotalPages · Hiển thị @Model.FirstItem–@Model.LastItem trong @Model.Total tài sản</span>
+                <div class="btn-group">
+                    @if (Model.Page > 1)
+                    {
+                        <a class="btn btn-outline-primary" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-pageSize="@Model.PageSize"
+                           asp-route-keyword="@Model.Keyword" asp-route-danhMucId="@Model.DanhMucId" asp-route-tinhTrang="@Model.TinhTrang"
+                           asp-route-trangThai="@Model.TrangThai" asp-route-sort="@Model.Sort">Trang trước</a>
+                    }
+                    @if (Model.Page < Model.TotalPages)
+                    {
+                        <a class="btn btn-outline-primary" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-pageSize="@Model.PageSize"
+                           asp-route-keyword="@Model.Keyword" asp-route-danhMucId="@Model.DanhMucId" asp-route-tinhTrang="@Model.TinhTrang"
+                           asp-route-trangThai="@Model.TrangThai" asp-route-sort="@Model.Sort">Trang sau</a>
+                    }
+                </div>
+            </nav>
+        </div></div>
+    </section>
+</main>

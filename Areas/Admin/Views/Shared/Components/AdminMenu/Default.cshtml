@@ -11,40 +11,45 @@
             </a>
         </li>
 
-        <!-- End Dashboard Nav -->
-
-        @if (Model != null)
+        @foreach (var item in Model.Where(m => m.ItemLevel == 1).OrderBy(m => m.ItemOrder))
         {
-            @foreach (var item in Model.Where(m => m.ItemLevel == 1).OrderBy(m => m.ItemOrder))
-            {
-                var pID = item.AdminMenuID;
-                var sMenu = Model.Where(p => p.ParentLevel == pID)
-                .OrderBy(p => p.ItemOrder).ToList();
+            var sMenu = Model.Where(m => m.ParentLevel == item.AdminMenuID)
+            .OrderBy(m => m.ItemOrder).ToList();
 
-                <li class="nav-item">
+            <li class="nav-item">
+
+                @if (sMenu.Any())
+                {
                     <a class="nav-link collapsed" data-bs-target="#@item.ItemTarget" data-bs-toggle="collapse" href="#">
                         <i class="@item.Icon"></i>
                         <span>@item.ItemName</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
 
-                    @if (sMenu.Any())
-                    {
-                        <ul id="@item.IdName" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                    <ul id="@item.IdName" class="nav-content collapse" data-bs-parent="#sidebar-nav">
 
-                            @foreach (var smn in sMenu)
-                            {
-                                <li>
-                                    <a href="/Admin/@smn.ControllerName/@smn.ActionName">
-                                        <i class="bi bi-circle"></i>
-                                        <span>@smn.ItemName</span>
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    }
-                </li>
-            }
+                        @foreach (var smn in sMenu)
+                        {
+                            <li>
+                                <a href="/Admin/@smn.ControllerName/@smn.ActionName">
+                                    <i class="bi bi-circle"></i>
+                                    <span>@smn.ItemName</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link collapsed" href="/Admin/@item.ControllerName/@item.ActionName">
+                            <i class="@item.Icon"></i>
+                            <span>@item.ItemName</span>
+                        </a>
+                    </li>
+                }
+
+            </li>
         }
 
     </ul>

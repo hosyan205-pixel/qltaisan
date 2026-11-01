@@ -1,0 +1,137 @@
+@using DoAn.Models
+@model IList<tblTaiKhoan>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Quản lý tài khoản";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h2>Quản lý tài khoản</h2>
+    </div>
+
+    <div class="mb-3">
+        <a href="/Admin/TaiKhoan/Create" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Thêm tài khoản
+        </a>
+    </div>
+
+    <form method="get" asp-area="Admin" asp-controller="TaiKhoan" asp-action="Index"
+          class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="d-flex gap-3">
+
+            <select name="vaiTro" class="form-select" style="width: 160px;">
+                <option value="">-- Tất cả vai trò --</option>
+                <option value="Admin" selected="@(ViewBag.VaiTro == "Admin")">Quản trị viên
+                </option>
+                <option value="NhanVien" selected="@(ViewBag.VaiTro == "NhanVien")">Nhân viên
+                </option>
+            </select>
+
+            <select name="trangThai" class="form-select" style="width: 160px;">
+                <option value="">-- Trạng thái --</option>
+                <option value="true" selected="@(ViewBag.TrangThai is true)">Hoạt động
+                </option>
+                <option value="false" selected="@(ViewBag.TrangThai is false)">Bị khóa
+                </option>
+            </select>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-funnel"></i> Lọc
+            </button>
+
+        </div>
+
+        <div>
+            <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control"
+                   placeholder="Tìm tên, tài khoản, email..." style="width: 260px;" />
+        </div>
+
+    </form>
+
+    <section class="section">
+        <div class="card">
+            <div class="card-body pt-4">
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover align-middle text-center">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Họ và tên</th>
+                                <th>Số điện thoại</th>
+                                <th>Email</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                                <th>Chức năng</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if (Model != null && Model.Count > 0)
+                            {
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.TK_ID</td>
+                                        <td class="fw-bold">@item.TK_TenDangNhap</td>
+                                        <td>@item.TK_HoTen</td>
+                                        <td>@item.TK_SoDienThoai</td>
+                                        <td>@item.TK_Email</td>
+                                        <td>
+                                            @if (item.TK_VaiTro == "Admin")
+                                            {
+                                                <span class="badge bg-primary">Quản trị viên</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-info text-dark">Nhân viên</span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            @if (item.TK_TrangThai)
+                                            {
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Bị khóa</span>
+                                            }
+                                        </td>
+
+                                        <td>
+                                            <a asp-area="Admin" asp-controller="TaiKhoan" asp-action="Edit"
+                                               asp-route-id="@item.TK_ID" class="btn btn-primary btn-sm" title="Sửa tài khoản">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            <a asp-area="Admin" asp-controller="TaiKhoan" asp-action="Delete"
+                                               asp-route-id="@item.TK_ID" class="btn btn-danger btn-sm" title="Xóa tài khoản">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">
+                                        Không tìm thấy tài khoản nào.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</main>

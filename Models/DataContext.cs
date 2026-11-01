@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using QuanLyTaiSan.Models;
+using DoAn.Models;
 
 namespace DoAn.Models
 {

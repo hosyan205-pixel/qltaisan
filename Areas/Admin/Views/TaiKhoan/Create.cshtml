@@ -1,0 +1,94 @@
+@model DoAn.Models.tblTaiKhoan
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thêm tài khoản";
+}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h2 class="text-success">
+            <i class="bi bi-person-plus"></i> Thêm tài khoản
+        </h2>
+    </div>
+
+    <section class="section">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <form asp-area="Admin" asp-controller="TaiKhoan" asp-action="Create" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tên đăng nhập</label>
+                            <input asp-for="TK_TenDangNhap" class="form-control" placeholder="Nhập tên đăng nhập" />
+                            <span asp-validation-for="TK_TenDangNhap" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Họ và tên</label>
+                            <input asp-for="TK_HoTen" class="form-control" placeholder="Nhập họ và tên" />
+                            <span asp-validation-for="TK_HoTen" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Mật khẩu</label>
+                            <input asp-for="TK_MatKhau" type="password" class="form-control"
+                                   placeholder="Nhập mật khẩu" />
+                            <span asp-validation-for="TK_MatKhau" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input asp-for="TK_SoDienThoai" class="form-control" placeholder="Nhập số điện thoại" />
+                            <span asp-validation-for="TK_SoDienThoai" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email</label>
+                            <input asp-for="TK_Email" type="email" class="form-control" placeholder="Nhập email" />
+                            <span asp-validation-for="TK_Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Vai trò</label>
+                            <select asp-for="TK_VaiTro" class="form-select">
+                                <option value="NhanVien">Nhân viên</option>
+                                <option value="Admin">Quản trị viên</option>
+                            </select>
+                            <span asp-validation-for="TK_VaiTro" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Trạng thái</label>
+                            <select asp-for="TK_TrangThai" class="form-select">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Bị khóa</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4 text-end">
+
+                        <a href="/Admin/TaiKhoan/Index" class="btn btn-secondary me-2">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Tạo tài khoản
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+</main>

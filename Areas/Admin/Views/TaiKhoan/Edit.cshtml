@@ -1,0 +1,102 @@
+@model DoAn.Models.tblTaiKhoan
+
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Cập nhật tài khoản";
+}
+
+<main id="main" class="main">
+
+    <div class="pagetitle">
+        <h2 class="text-primary">
+            <i class="bi bi-pencil-square"></i> Cập nhật tài khoản
+        </h2>
+    </div>
+
+    <section class="section">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <form asp-area="Admin" asp-controller="TaiKhoan" asp-action="Edit" asp-route-id="@Model.TK_ID"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" asp-for="TK_ID" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tên đăng nhập</label>
+                            <input asp-for="TK_TenDangNhap" class="form-control" />
+                            <span asp-validation-for="TK_TenDangNhap" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Họ và tên</label>
+                            <input asp-for="TK_HoTen" class="form-control" />
+                            <span asp-validation-for="TK_HoTen" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email</label>
+                            <input asp-for="TK_Email" type="email" class="form-control" />
+                            <span asp-validation-for="TK_Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Số điện thoại</label>
+                            <input asp-for="TK_SoDienThoai" class="form-control" />
+                            <span asp-validation-for="TK_SoDienThoai" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Mật khẩu mới</label>
+                            <input asp-for="TK_MatKhau" type="password" class="form-control"
+                                   placeholder="Để trống nếu không đổi mật khẩu" />
+                            <span asp-validation-for="TK_MatKhau" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Vai trò</label>
+                            <select asp-for="TK_VaiTro" class="form-select">
+                                <option value="NhanVien">Nhân viên</option>
+                                <option value="Admin">Quản trị viên</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Trạng thái</label>
+                            <select asp-for="TK_TrangThai" class="form-select">
+                                <option value="true">Hoạt động</option>
+                                <option value="false">Bị khóa</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Ngày tạo</label>
+                            <input class="form-control" value="@Model.TK_NgayTao.ToString("dd/MM/yyyy HH:mm")"
+                                   disabled />
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4 text-end">
+
+                        <a asp-area="Admin" asp-controller="TaiKhoan" asp-action="Index" class="btn btn-secondary me-2">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Lưu thay đổi
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </section>
+
+</main>

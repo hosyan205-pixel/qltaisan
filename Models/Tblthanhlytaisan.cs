@@ -1,29 +1,49 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblthanhlytaisan
+namespace DoAn.Models
 {
-    public int TlId { get; set; }
+    [Table("tblthanhlytaisan")]
+    public class tblThanhLyTaiSan
+    {
+        [Key]
+        [Column("TL_ID")]
+        public int TL_ID { get; set; }
 
-    public string TlMaPhieu { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập mã phiếu thanh lý!")]
+        [StringLength(30, ErrorMessage = "Mã phiếu thanh lý không quá 30 ký tự")]
+        [Column("TL_MaPhieu")]
+        public string TL_MaPhieu { get; set; } = null!;
 
-    public DateOnly TlNgayThanhLy { get; set; }
+        [Column("TL_NgayThanhLy")]
+        public DateOnly? TL_NgayThanhLy { get; set; }
 
-    public int TlNguoiLapId { get; set; }
+        [StringLength(100)]
+        [Column("TL_PhuongThuc")]
+        public string? TL_PhuongThuc { get; set; }
 
-    public string TlLyDo { get; set; } = null!;
+        [Column("TL_TongGiaTri")]
+        public decimal? TL_TongGiaTri { get; set; }
 
-    public decimal TlTongGiaTri { get; set; }
+        [Column("TL_LyDo")]
+        public string? TL_LyDo { get; set; }
 
-    public string? TlPhuongThuc { get; set; }
+        [Required]
+        [Column("TL_NguoiLapID")]
+        public int TL_NguoiLapID { get; set; }
 
-    public string TlTrangThai { get; set; } = null!;
+        [StringLength(50)]
+        [Column("TL_TrangThai")]
+        public string TL_TrangThai { get; set; } = "ChoDuyet";
 
-    public string? TlGhiChu { get; set; }
+        [Column("TL_GhiChu")]
+        public string? TL_GhiChu { get; set; }
 
-    public virtual ICollection<Tblchitietthanhly> Tblchitietthanhlies { get; set; } = new List<Tblchitietthanhly>();
+        [ForeignKey("TL_NguoiLapID")]
+        public virtual tblTaiKhoan? NguoiLap { get; set; }
 
-    public virtual Tbltaikhoan TlNguoiLap { get; set; } = null!;
+        public virtual ICollection<tblChiTietThanhLy> tblChiTietThanhLies { get; set; } = new List<tblChiTietThanhLy>();
+    }
 }

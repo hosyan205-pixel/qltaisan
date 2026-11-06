@@ -1,27 +1,45 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblkiemketaisan
+namespace DoAn.Models
 {
-    public int KkId { get; set; }
+    [Table("tblkiemketaisan")]
+    public class tblKiemKeTaiSan
+    {
+        [Key]
+        [Column("KK_ID")]
+        public int KK_ID { get; set; }
 
-    public string KkMaPhieu { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập mã phiếu kiểm kê!")]
+        [StringLength(30, ErrorMessage = "Mã phiếu kiểm kê không quá 30 ký tự")]
+        [Column("KK_MaPhieu")]
+        public string KK_MaPhieu { get; set; } = null!;
 
-    public int? PbId { get; set; }
+        [Column("KK_NgayKiemKe")]
+        public DateOnly? KK_NgayKiemKe { get; set; }
 
-    public DateOnly KkNgayKiemKe { get; set; }
+        [Column("PB_ID")]
+        public int? PB_ID { get; set; }
 
-    public int KkNguoiKiemKeId { get; set; }
+        [Required]
+        [Column("KK_NguoiKiemKeID")]
+        public int KK_NguoiKiemKeID { get; set; }
 
-    public string? KkGhiChu { get; set; }
+        [StringLength(50)]
+        [Column("KK_TrangThai")]
+        public string KK_TrangThai { get; set; } = "DangKiemKe";
 
-    public string KkTrangThai { get; set; } = null!;
+        [Column("KK_GhiChu")]
+        public string? KK_GhiChu { get; set; }
 
-    public virtual Tbltaikhoan KkNguoiKiemKe { get; set; } = null!;
+        [ForeignKey("KK_NguoiKiemKeID")]
+        public virtual tblTaiKhoan? NguoiKiemKe { get; set; }
 
-    public virtual Tblphongban? Pb { get; set; }
+        [ForeignKey("PB_ID")]
+        public virtual tblPhongBan? PhongBan { get; set; }
 
-    public virtual ICollection<Tblchitietkiemke> Tblchitietkiemkes { get; set; } = new List<Tblchitietkiemke>();
+        public virtual ICollection<tblChiTietKiemKe> tblChiTietKiemKes { get; set; } = new List<tblChiTietKiemKe>();
+    }
 }

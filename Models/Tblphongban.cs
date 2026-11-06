@@ -1,27 +1,43 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblphongban
+namespace DoAn.Models
 {
-    public int PbId { get; set; }
+    [Table("tblphongban")]
+    public class tblPhongBan
+    {
+        [Key]
+        [Column("PB_ID")]
+        public int PB_ID { get; set; }
 
-    public string PbMaPhongBan { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập mã phòng ban!")]
+        [StringLength(30, ErrorMessage = "Mã phòng ban không quá 30 ký tự")]
+        [Column("PB_MaPhongBan")]
+        public string PB_MaPhongBan { get; set; } = null!;
 
-    public string PbTenPhongBan { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập tên phòng ban!")]
+        [StringLength(150, ErrorMessage = "Tên phòng ban không quá 150 ký tự")]
+        [Column("PB_TenPhongBan")]
+        public string PB_TenPhongBan { get; set; } = null!;
 
-    public string? PbDiaChi { get; set; }
+        [Column("PB_NguoiPhuTrach")]
+        public string? PB_NguoiPhuTrach { get; set; }
 
-    public string? PbSoDienThoai { get; set; }
+        [Column("PB_SoDienThoai")]
+        public string? PB_SoDienThoai { get; set; }
 
-    public string? PbNguoiPhuTrach { get; set; }
+        [Column("PB_DiaChi")]
+        public string? PB_DiaChi { get; set; }
 
-    public DateTime PbNgayTao { get; set; }
+        [Column("PB_TrangThai")]
+        public bool? PB_TrangThai { get; set; } = true;
 
-    public bool? PbTrangThai { get; set; }
+        [Column("PB_NgayTao")]
+        public DateTime PB_NgayTao { get; set; } = DateTime.Now;
 
-    public virtual ICollection<Tblcapphattaisan> Tblcapphattaisans { get; set; } = new List<Tblcapphattaisan>();
-
-    public virtual ICollection<Tblkiemketaisan> Tblkiemketaisans { get; set; } = new List<Tblkiemketaisan>();
+        public virtual ICollection<tblCapPhatTaiSan> tblCapPhatTaiSans { get; set; } = new List<tblCapPhatTaiSan>();
+        public virtual ICollection<tblKiemKeTaiSan> tblKiemKeTaiSans { get; set; } = new List<tblKiemKeTaiSan>();
+    }
 }

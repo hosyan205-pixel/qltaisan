@@ -1,27 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblmenu
+namespace DoAn.Models
 {
-    public int MenuId { get; set; }
+    [Table("tblmenu")]
+    public class tblMenu
+    {
+        [Key]
+        [Column("MenuID")]
+        public int MenuID { get; set; }
 
-    public string MenuName { get; set; } = null!;
+        [Column("MenuName")]
+        public string? MenuName { get; set; }
 
-    public ulong IsActive { get; set; }
+        [Column("IsActive")]
+        public bool? IsActive { get; set; }
 
-    public string ControllerName { get; set; } = null!;
+        [Column("ControllerName")]
+        public string? ControllerName { get; set; }
 
-    public string ActionName { get; set; } = null!;
+        [Column("ActionName")]
+        public string? ActionName { get; set; }
 
-    public int Levels { get; set; }
+        [Column("Levels")]
+        public int Levels { get; set; }
 
-    public int ParentId { get; set; }
+        [Column("ParentID")]
+        public int ParentID { get; set; }
 
-    public string Link { get; set; } = null!;
+        [Column("Link")]
+        public string? Link { get; set; }
 
-    public int MenuOrder { get; set; }
+        [Column("MenuOrder")]
+        public int MenuOrder { get; set; }
 
-    public int Position { get; set; }
+        [Column("Position")]
+        public int Position { get; set; }
+    }
 }

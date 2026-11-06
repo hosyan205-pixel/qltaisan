@@ -1,4 +1,5 @@
-@model Tbltaisan
+@using DoAn.Models
+@model tblTaiSan
 @{ ViewData["Title"] = "Xóa tài sản"; }
 <main id="main" class="main">
     <div class="pagetitle"><h1>Xóa tài sản</h1></div>
@@ -10,10 +11,10 @@
         }
         else
         {
-            <div class="alert alert-danger">Bạn có chắc chắn muốn xóa tài sản @Model.TsMaTaiSan – @Model.TsTenTaiSan? Thao tác này không thể hoàn tác.</div>
+            <div class="alert alert-danger">Bạn có chắc chắn muốn xóa tài sản @Model.TS_MaTaiSan – @Model.TS_TenTaiSan? Thao tác này không thể hoàn tác.</div>
         }
         <partial name="_ThongTin" model="Model" />
-        <form asp-action="Delete" asp-route-id="@Model.TsId" method="post">
+        <form asp-action="Delete" asp-route-id="@Model.TS_ID" method="post">
             @if (ViewBag.HasHistory != true) { <button type="submit" class="btn btn-danger">Xác nhận xóa</button> }
             <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
         </form>

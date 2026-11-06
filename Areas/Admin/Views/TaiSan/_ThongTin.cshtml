@@ -1,17 +1,18 @@
+@using DoAn.Models
 @using DoAn.Services.Assets
-@model Tbltaisan
+@model tblTaiSan
 <dl class="row">
-    <dt class="col-sm-3">Mã tài sản</dt><dd class="col-sm-9">@Model.TsMaTaiSan</dd>
-    <dt class="col-sm-3">Tên tài sản</dt><dd class="col-sm-9">@Model.TsTenTaiSan</dd>
-    <dt class="col-sm-3">Danh mục</dt><dd class="col-sm-9">@Model.Dmts.DmtsTenDanhMuc</dd>
-    <dt class="col-sm-3">Nguyên giá</dt><dd class="col-sm-9">@AssetDisplay.Money(Model.TsNguyenGia)</dd>
-    <dt class="col-sm-3">Ngày mua</dt><dd class="col-sm-9">@(Model.TsNgayMua?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
-    <dt class="col-sm-3">Hạn bảo hành</dt><dd class="col-sm-9">@(Model.TsHanBaoHanh?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
-    @{ var warranty = AssetDisplay.Warranty(Model.TsHanBaoHanh); }
+    <dt class="col-sm-3">Mã tài sản</dt><dd class="col-sm-9">@Model.TS_MaTaiSan</dd>
+    <dt class="col-sm-3">Tên tài sản</dt><dd class="col-sm-9">@Model.TS_TenTaiSan</dd>
+    <dt class="col-sm-3">Danh mục</dt><dd class="col-sm-9">@Model.tblDanhMucTaiSan?.DMTS_TenDanhMuc</dd>
+    <dt class="col-sm-3">Nguyên giá</dt><dd class="col-sm-9">@AssetDisplay.Money(Model.TS_NguyenGia)</dd>
+    <dt class="col-sm-3">Ngày mua</dt><dd class="col-sm-9">@(Model.TS_NgayMua?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
+    <dt class="col-sm-3">Hạn bảo hành</dt><dd class="col-sm-9">@(Model.TS_HanBaoHanh?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
+    @{ var warranty = AssetDisplay.Warranty(Model.TS_HanBaoHanh); }
     <dt class="col-sm-3">Bảo hành</dt><dd class="col-sm-9"><span class="badge @warranty.Css">@warranty.Label</span></dd>
-    <dt class="col-sm-3">Tình trạng</dt><dd class="col-sm-9">@AssetDisplay.Label(AssetConditions.Labels, AssetConditions.Normalize(Model.TsTinhTrang))</dd>
-    <dt class="col-sm-3">Trạng thái</dt><dd class="col-sm-9"><span class="badge @AssetStatuses.Badge(Model.TsTrangThai)">@AssetDisplay.Label(AssetStatuses.Labels, Model.TsTrangThai)</span></dd>
-    <dt class="col-sm-3">Mô tả</dt><dd class="col-sm-9" style="white-space: pre-wrap; overflow-wrap: anywhere">@(Model.TsMoTa ?? "—")</dd>
-    <dt class="col-sm-3">Ghi chú</dt><dd class="col-sm-9" style="white-space: pre-wrap; overflow-wrap: anywhere">@(Model.TsGhiChu ?? "—")</dd>
-    <dt class="col-sm-3">Ngày tạo</dt><dd class="col-sm-9">@Model.TsNgayTao.ToString("dd/MM/yyyy HH:mm")</dd>
+    <dt class="col-sm-3">Tình trạng</dt><dd class="col-sm-9">@AssetDisplay.Label(AssetConditions.Labels, AssetConditions.Normalize(Model.TS_TinhTrang))</dd>
+    <dt class="col-sm-3">Trạng thái</dt><dd class="col-sm-9"><span class="badge @AssetStatuses.Badge(Model.TS_TrangThai)">@AssetDisplay.Label(AssetStatuses.Labels, Model.TS_TrangThai)</span></dd>
+    <dt class="col-sm-3">Mô tả</dt><dd class="col-sm-9" style="white-space: pre-wrap; overflow-wrap: anywhere">@(Model.TS_MoTa ?? "—")</dd>
+    <dt class="col-sm-3">Ghi chú</dt><dd class="col-sm-9" style="white-space: pre-wrap; overflow-wrap: anywhere">@(Model.TS_GhiChu ?? "—")</dd>
+    <dt class="col-sm-3">Ngày tạo</dt><dd class="col-sm-9">@Model.TS_NgayTao.ToString("dd/MM/yyyy HH:mm")</dd>
 </dl>

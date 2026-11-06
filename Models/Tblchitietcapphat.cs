@@ -1,25 +1,43 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblchitietcapphat
+namespace DoAn.Models
 {
-    public int CtcpId { get; set; }
+    [Table("tblchitietcapphat")]
+    public class tblChiTietCapPhat
+    {
+        [Key]
+        [Column("CTCP_ID")]
+        public int CTCP_ID { get; set; }
 
-    public int CpId { get; set; }
+        [Required]
+        [Column("CP_ID")]
+        public int CP_ID { get; set; }
 
-    public int TsId { get; set; }
+        [Required]
+        [Column("TS_ID")]
+        public int TS_ID { get; set; }
 
-    public DateOnly? CtcpNgayThuHoi { get; set; }
+        [StringLength(100)]
+        [Column("CTCP_TinhTrangKhiGiao")]
+        public string? CTCP_TinhTrangKhiGiao { get; set; }
 
-    public string? CtcpTinhTrangKhiGiao { get; set; }
+        [StringLength(100)]
+        [Column("CTCP_TinhTrangKhiThuHoi")]
+        public string? CTCP_TinhTrangKhiThuHoi { get; set; }
 
-    public string? CtcpTinhTrangKhiThuHoi { get; set; }
+        [Column("CTCP_NgayThuHoi")]
+        public DateOnly? CTCP_NgayThuHoi { get; set; }
 
-    public string? CtcpGhiChu { get; set; }
+        [Column("CTCP_GhiChu")]
+        public string? CTCP_GhiChu { get; set; }
 
-    public virtual Tblcapphattaisan Cp { get; set; } = null!;
+        [ForeignKey("CP_ID")]
+        public virtual tblCapPhatTaiSan? CapPhat { get; set; }
 
-    public virtual Tbltaisan Ts { get; set; } = null!;
+        [ForeignKey("TS_ID")]
+        public virtual tblTaiSan? TaiSan { get; set; }
+    }
 }

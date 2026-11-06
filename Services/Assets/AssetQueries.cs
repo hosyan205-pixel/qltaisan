@@ -11,25 +11,25 @@ public static class AssetQueries
         ["created_asc"] = "Ngày tạo ↑", ["created_desc"] = "Ngày tạo ↓"
     });
 
-    public static IQueryable<Tbltaisan> Filter(IQueryable<Tbltaisan> query, string? keyword, int? categoryId, string? condition, string? status)
+    public static IQueryable<tblTaiSan> Filter(IQueryable<tblTaiSan> query, string? keyword, int? categoryId, string? condition, string? status)
     {
         keyword = keyword?.Trim();
-        if (!string.IsNullOrEmpty(keyword)) query = query.Where(x => x.TsMaTaiSan.Contains(keyword) || x.TsTenTaiSan.Contains(keyword));
-        if (categoryId.HasValue) query = query.Where(x => x.DmtsId == categoryId);
+        if (!string.IsNullOrEmpty(keyword)) query = query.Where(x => x.TS_MaTaiSan.Contains(keyword) || x.TS_TenTaiSan.Contains(keyword));
+        if (categoryId.HasValue) query = query.Where(x => x.DMTS_ID == categoryId);
         if (!string.IsNullOrEmpty(condition))
             query = condition == AssetConditions.Damaged
-                ? query.Where(x => x.TsTinhTrang == AssetConditions.Damaged || x.TsTinhTrang == AssetConditions.LegacyDamaged)
-                : query.Where(x => x.TsTinhTrang == condition);
-        if (!string.IsNullOrEmpty(status)) query = query.Where(x => x.TsTrangThai == status);
+                ? query.Where(x => x.TS_TinhTrang == AssetConditions.Damaged || x.TS_TinhTrang == AssetConditions.LegacyDamaged)
+                : query.Where(x => x.TS_TinhTrang == condition);
+        if (!string.IsNullOrEmpty(status)) query = query.Where(x => x.TS_TrangThai == status);
         return query;
     }
 
-    public static IOrderedQueryable<Tbltaisan> Sort(IQueryable<Tbltaisan> query, string sort) => (sort switch
+    public static IOrderedQueryable<tblTaiSan> Sort(IQueryable<tblTaiSan> query, string sort) => (sort switch
     {
-        "code_asc" => query.OrderBy(x => x.TsMaTaiSan), "code_desc" => query.OrderByDescending(x => x.TsMaTaiSan),
-        "name_asc" => query.OrderBy(x => x.TsTenTaiSan), "name_desc" => query.OrderByDescending(x => x.TsTenTaiSan),
-        "price_asc" => query.OrderBy(x => x.TsNguyenGia), "price_desc" => query.OrderByDescending(x => x.TsNguyenGia),
-        "purchase_asc" => query.OrderBy(x => x.TsNgayMua), "purchase_desc" => query.OrderByDescending(x => x.TsNgayMua),
-        "created_asc" => query.OrderBy(x => x.TsNgayTao), _ => query.OrderByDescending(x => x.TsNgayTao)
-    }).ThenBy(x => x.TsId);
+        "code_asc" => query.OrderBy(x => x.TS_MaTaiSan), "code_desc" => query.OrderByDescending(x => x.TS_MaTaiSan),
+        "name_asc" => query.OrderBy(x => x.TS_TenTaiSan), "name_desc" => query.OrderByDescending(x => x.TS_TenTaiSan),
+        "price_asc" => query.OrderBy(x => x.TS_NguyenGia), "price_desc" => query.OrderByDescending(x => x.TS_NguyenGia),
+        "purchase_asc" => query.OrderBy(x => x.TS_NgayMua), "purchase_desc" => query.OrderByDescending(x => x.TS_NgayMua),
+        "created_asc" => query.OrderBy(x => x.TS_NgayTao), _ => query.OrderByDescending(x => x.TS_NgayTao)
+    }).ThenBy(x => x.TS_ID);
 }

@@ -1,46 +1,52 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tbltaikhoan
+namespace DoAn.Models
 {
-    public int TkId { get; set; }
+    [Table("tbltaikhoan")]
+    public class tblTaiKhoan
+    {
+        [Key]
+        [Column("TK_ID")]
+        public int TK_ID { get; set; }
 
-    [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập!")]
-    [RegularExpression(@"^[a-zA-Z0-9_]+$",
-        ErrorMessage = "Tên đăng nhập không được có dấu hoặc dấu cách!")]
-    public string TkTenDangNhap { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập!")]
+        [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Tên đăng nhập không được có dấu hoặc dấu cách!")]
+        [StringLength(50, ErrorMessage = "Tên đăng nhập không quá 50 ký tự")]
+        [Column("TK_TenDangNhap")]
+        public string TK_TenDangNhap { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập mật khẩu!")]
-    [StringLength(255, ErrorMessage = "Mật khẩu không được quá 255 ký tự")]
-    public string TkMatKhau { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu!")]
+        [StringLength(255, ErrorMessage = "Mật khẩu không được quá 255 ký tự")]
+        [Column("TK_MatKhau")]
+        public string TK_MatKhau { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Vui lòng nhập họ và tên!")]
-    [StringLength(100, ErrorMessage = "Họ và tên không được quá 100 ký tự")]
-    public string TkHoTen { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập họ và tên!")]
+        [StringLength(100, ErrorMessage = "Họ và tên không được quá 100 ký tự")]
+        [Column("TK_HoTen")]
+        public string TK_HoTen { get; set; } = string.Empty;
 
-    [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
-    public string? TkEmail { get; set; }
+        [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
+        [Column("TK_Email")]
+        public string? TK_Email { get; set; }
 
-    public string? TkSoDienThoai { get; set; }
+        [Column("TK_SoDienThoai")]
+        public string? TK_SoDienThoai { get; set; }
 
-    public string TkVaiTro { get; set; } = "NhanVien";
+        [Column("TK_VaiTro")]
+        public string TK_VaiTro { get; set; } = "NhanVien";
 
-    public bool? TkTrangThai { get; set; } = true;
+        [Column("TK_TrangThai")]
+        public bool TK_TrangThai { get; set; } = true;
 
-    public DateTime TkNgayTao { get; set; } = DateTime.Now;
+        [Column("TK_NgayTao")]
+        public DateTime TK_NgayTao { get; set; } = DateTime.Now;
 
-    public virtual ICollection<Tblbaotritaisan> Tblbaotritaisans { get; set; }
-        = new List<Tblbaotritaisan>();
-
-    public virtual ICollection<Tblcapphattaisan> Tblcapphattaisans { get; set; }
-        = new List<Tblcapphattaisan>();
-
-    public virtual ICollection<Tblkiemketaisan> Tblkiemketaisans { get; set; }
-        = new List<Tblkiemketaisan>();
-
-    public virtual ICollection<Tblthanhlytaisan> Tblthanhlytaisans { get; set; }
-        = new List<Tblthanhlytaisan>();
+        public virtual ICollection<tblBaoTriTaiSan> tblBaoTriTaiSans { get; set; } = new List<tblBaoTriTaiSan>();
+        public virtual ICollection<tblCapPhatTaiSan> tblCapPhatTaiSans { get; set; } = new List<tblCapPhatTaiSan>();
+        public virtual ICollection<tblKiemKeTaiSan> tblKiemKeTaiSans { get; set; } = new List<tblKiemKeTaiSan>();
+        public virtual ICollection<tblThanhLyTaiSan> tblThanhLyTaiSans { get; set; } = new List<tblThanhLyTaiSan>();
+    }
 }

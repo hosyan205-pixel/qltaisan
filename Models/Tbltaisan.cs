@@ -1,41 +1,64 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tbltaisan
+namespace DoAn.Models
 {
-    public int TsId { get; set; }
+    [Table("tbltaisan")]
+    public class tblTaiSan
+    {
+        [Key]
+        [Column("TS_ID")]
+        public int TS_ID { get; set; }
 
-    public string TsMaTaiSan { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập mã tài sản!")]
+        [StringLength(30, ErrorMessage = "Mã tài sản không quá 30 ký tự")]
+        [Column("TS_MaTaiSan")]
+        public string TS_MaTaiSan { get; set; } = null!;
 
-    public string TsTenTaiSan { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập tên tài sản!")]
+        [StringLength(150, ErrorMessage = "Tên tài sản không quá 150 ký tự")]
+        [Column("TS_TenTaiSan")]
+        public string TS_TenTaiSan { get; set; } = null!;
 
-    public int DmtsId { get; set; }
+        [Required]
+        [Column("DMTS_ID")]
+        public int DMTS_ID { get; set; }
 
-    public string? TsMoTa { get; set; }
+        [Column("TS_MoTa")]
+        public string? TS_MoTa { get; set; }
 
-    public DateOnly? TsNgayMua { get; set; }
+        [Column("TS_NgayMua")]
+        public DateOnly? TS_NgayMua { get; set; }
 
-    public decimal TsNguyenGia { get; set; }
+        [Column("TS_NguyenGia")]
+        public decimal TS_NguyenGia { get; set; }
 
-    public DateOnly? TsHanBaoHanh { get; set; }
+        [Column("TS_HanBaoHanh")]
+        public DateOnly? TS_HanBaoHanh { get; set; }
 
-    public string TsTinhTrang { get; set; } = null!;
+        [Column("TS_TinhTrang")]
+        public string TS_TinhTrang { get; set; } = "Tot";
 
-    public string TsTrangThai { get; set; } = null!;
+        [Column("TS_TrangThai")]
+        public string TS_TrangThai { get; set; } = "ChuaCapPhat";
 
-    public string? TsGhiChu { get; set; }
+        [Column("TS_GhiChu")]
+        public string? TS_GhiChu { get; set; }
 
-    public DateTime TsNgayTao { get; set; }
+        [Column("TS_NgayTao")]
+        public DateTime TS_NgayTao { get; set; } = DateTime.Now;
 
-    public virtual Tbldanhmuctaisan Dmts { get; set; } = null!;
+        [ForeignKey(nameof(DMTS_ID))]
+        public virtual tblDanhMucTaiSan? tblDanhMucTaiSan { get; set; }
 
-    public virtual ICollection<Tblbaotritaisan> Tblbaotritaisans { get; set; } = new List<Tblbaotritaisan>();
+        public virtual ICollection<tblBaoTriTaiSan> tblBaoTriTaiSans { get; set; } = new List<tblBaoTriTaiSan>();
 
-    public virtual ICollection<Tblchitietcapphat> Tblchitietcapphats { get; set; } = new List<Tblchitietcapphat>();
+        public virtual ICollection<tblChiTietCapPhat> tblChiTietCapPhats { get; set; } = new List<tblChiTietCapPhat>();
 
-    public virtual ICollection<Tblchitietkiemke> Tblchitietkiemkes { get; set; } = new List<Tblchitietkiemke>();
+        public virtual ICollection<tblChiTietKiemKe> tblChiTietKiemKes { get; set; } = new List<tblChiTietKiemKe>();
 
-    public virtual ICollection<Tblchitietthanhly> Tblchitietthanhlies { get; set; } = new List<Tblchitietthanhly>();
+        public virtual ICollection<tblChiTietThanhLy> tblChiTietThanhLies { get; set; } = new List<tblChiTietThanhLy>();
+    }
 }

@@ -1,31 +1,53 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblcapphattaisan
+namespace DoAn.Models
 {
-    public int CpId { get; set; }
+    [Table("tblcapphattaisan")]
+    public class tblCapPhatTaiSan
+    {
+        [Key]
+        [Column("CP_ID")]
+        public int CP_ID { get; set; }
 
-    public string CpMaPhieu { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập mã phiếu cấp phát!")]
+        [StringLength(30, ErrorMessage = "Mã phiếu cấp phát không quá 30 ký tự")]
+        [Column("CP_MaPhieu")]
+        public string CP_MaPhieu { get; set; } = null!;
 
-    public int PbId { get; set; }
+        [Column("CP_NgayCapPhat")]
+        public DateOnly? CP_NgayCapPhat { get; set; }
 
-    public string CpNguoiNhan { get; set; } = null!;
+        [Required]
+        [Column("PB_ID")]
+        public int PB_ID { get; set; }
 
-    public int CpNguoiGiaoId { get; set; }
+        [StringLength(100)]
+        [Column("CP_NguoiNhan")]
+        public string? CP_NguoiNhan { get; set; }
 
-    public DateOnly CpNgayCapPhat { get; set; }
+        [Column("CP_LyDo")]
+        public string? CP_LyDo { get; set; }
 
-    public string? CpLyDo { get; set; }
+        [Column("CP_GhiChu")]
+        public string? CP_GhiChu { get; set; }
 
-    public string CpTrangThai { get; set; } = null!;
+        [StringLength(50)]
+        [Column("CP_TrangThai")]
+        public string CP_TrangThai { get; set; } = "DaCapPhat";
 
-    public string? CpGhiChu { get; set; }
+        [Required]
+        [Column("CP_NguoiGiaoID")]
+        public int CP_NguoiGiaoID { get; set; }
 
-    public virtual Tbltaikhoan CpNguoiGiao { get; set; } = null!;
+        [ForeignKey("PB_ID")]
+        public virtual tblPhongBan? PhongBan { get; set; }
 
-    public virtual Tblphongban Pb { get; set; } = null!;
+        [ForeignKey("CP_NguoiGiaoID")]
+        public virtual tblTaiKhoan? NguoiGiao { get; set; }
 
-    public virtual ICollection<Tblchitietcapphat> Tblchitietcapphats { get; set; } = new List<Tblchitietcapphat>();
+        public virtual ICollection<tblChiTietCapPhat> tblChiTietCapPhats { get; set; } = new List<tblChiTietCapPhat>();
+    }
 }

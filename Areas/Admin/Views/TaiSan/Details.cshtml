@@ -1,12 +1,13 @@
-@model Tbltaisan
+@using DoAn.Models
+@model tblTaiSan
 @{ ViewData["Title"] = "Chi tiết tài sản"; }
 <main id="main" class="main">
-    <div class="pagetitle"><h1>Chi tiết tài sản</h1><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a asp-action="Index">Quản lý tài sản</a></li><li class="breadcrumb-item active">@Model.TsMaTaiSan</li></ol></nav></div>
+    <div class="pagetitle"><h1>Chi tiết tài sản</h1><nav><ol class="breadcrumb"><li class="breadcrumb-item"><a asp-action="Index">Quản lý tài sản</a></li><li class="breadcrumb-item active">@Model.TS_MaTaiSan</li></ol></nav></div>
     @if (TempData["Success"] is string message) { <div class="alert alert-success" role="status">@message</div> }
-    <div class="card"><div class="card-body"><h2 class="card-title">@Model.TsTenTaiSan</h2>
+    <div class="card"><div class="card-body"><h2 class="card-title">@Model.TS_TenTaiSan</h2>
         <partial name="_ThongTin" model="Model" />
-        <a asp-action="Edit" asp-route-id="@Model.TsId" class="btn btn-primary">Sửa tài sản</a>
-        <a asp-action="Delete" asp-route-id="@Model.TsId" class="btn btn-outline-danger">Xóa</a>
+        <a asp-action="Edit" asp-route-id="@Model.TS_ID" class="btn btn-primary">Sửa tài sản</a>
+        <a asp-action="Delete" asp-route-id="@Model.TS_ID" class="btn btn-outline-danger">Xóa</a>
         <a asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
     </div></div>
 </main>

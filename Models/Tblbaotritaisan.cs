@@ -1,35 +1,60 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblbaotritaisan
+namespace DoAn.Models
 {
-    public int BtId { get; set; }
+    [Table("tblbaotritaisan")]
+    public class tblBaoTriTaiSan
+    {
+        [Key]
+        [Column("BT_ID")]
+        public int BT_ID { get; set; }
 
-    public string BtMaPhieu { get; set; } = null!;
+        [Required]
+        [Column("TS_ID")]
+        public int TS_ID { get; set; }
 
-    public int TsId { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập mã phiếu bảo trì!")]
+        [StringLength(30, ErrorMessage = "Mã phiếu bảo trì không quá 30 ký tự")]
+        [Column("BT_MaPhieu")]
+        public string BT_MaPhieu { get; set; } = null!;
 
-    public int BtNguoiLapId { get; set; }
+        [Column("BT_NgayBaoTri")]
+        public DateOnly? BT_NgayBaoTri { get; set; }
 
-    public DateOnly BtNgayBaoTri { get; set; }
+        [Column("BT_NgayHoanThanh")]
+        public DateOnly? BT_NgayHoanThanh { get; set; }
 
-    public DateOnly? BtNgayHoanThanh { get; set; }
+        [StringLength(150)]
+        [Column("BT_DonViBaoTri")]
+        public string? BT_DonViBaoTri { get; set; }
 
-    public string BtLyDo { get; set; } = null!;
+        [Column("BT_ChiPhi")]
+        public decimal? BT_ChiPhi { get; set; }
 
-    public string? BtNoiDung { get; set; }
+        [Column("BT_NoiDung")]
+        public string? BT_NoiDung { get; set; }
 
-    public decimal BtChiPhi { get; set; }
+        [Column("BT_LyDo")]
+        public string? BT_LyDo { get; set; }
 
-    public string? BtDonViBaoTri { get; set; }
+        [Column("BT_GhiChu")]
+        public string? BT_GhiChu { get; set; }
 
-    public string BtTrangThai { get; set; } = null!;
+        [StringLength(50)]
+        [Column("BT_TrangThai")]
+        public string BT_TrangThai { get; set; } = "ChoXuLy";
 
-    public string? BtGhiChu { get; set; }
+        [Required]
+        [Column("BT_NguoiLapID")]
+        public int BT_NguoiLapID { get; set; }
 
-    public virtual Tbltaikhoan BtNguoiLap { get; set; } = null!;
+        [ForeignKey("TS_ID")]
+        public virtual tblTaiSan? TaiSan { get; set; }
 
-    public virtual Tbltaisan Ts { get; set; } = null!;
+        [ForeignKey("BT_NguoiLapID")]
+        public virtual tblTaiKhoan? NguoiLap { get; set; }
+    }
 }

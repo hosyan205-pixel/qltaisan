@@ -1,21 +1,36 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tbldanhmuctaisan
+namespace DoAn.Models
 {
-    public int DmtsId { get; set; }
+    [Table("tbldanhmuctaisan")]
+    public class tblDanhMucTaiSan
+    {
+        [Key]
+        [Column("DMTS_ID")]
+        public int DMTS_ID { get; set; }
 
-    public string DmtsMaDanhMuc { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập mã danh mục!")]
+        [StringLength(30, ErrorMessage = "Mã danh mục không quá 30 ký tự")]
+        [Column("DMTS_MaDanhMuc")]
+        public string DMTS_MaDanhMuc { get; set; } = null!;
 
-    public string DmtsTenDanhMuc { get; set; } = null!;
+        [Required(ErrorMessage = "Vui lòng nhập tên danh mục!")]
+        [StringLength(100, ErrorMessage = "Tên danh mục không quá 100 ký tự")]
+        [Column("DMTS_TenDanhMuc")]
+        public string DMTS_TenDanhMuc { get; set; } = null!;
 
-    public string? DmtsMoTa { get; set; }
+        [Column("DMTS_MoTa")]
+        public string? DMTS_MoTa { get; set; }
 
-    public DateTime DmtsNgayTao { get; set; }
+        [Column("DMTS_TrangThai")]
+        public bool? DMTS_TrangThai { get; set; } = true;
 
-    public bool? DmtsTrangThai { get; set; }
+        [Column("DMTS_NgayTao")]
+        public DateTime DMTS_NgayTao { get; set; } = DateTime.Now;
 
-    public virtual ICollection<Tbltaisan> Tbltaisans { get; set; } = new List<Tbltaisan>();
+        public virtual ICollection<tblTaiSan> tblTaiSans { get; set; } = new List<tblTaiSan>();
+    }
 }

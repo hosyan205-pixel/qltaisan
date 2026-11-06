@@ -60,7 +60,7 @@ public class AssetEditViewModel : AssetFieldsViewModel
 
 public class TaiSanIndex
 {
-    public List<Tbltaisan> Items { get; set; } = new();
+    public List<tblTaiSan> Items { get; set; } = new();
     public string? Keyword { get; set; }
     public int? DanhMucId { get; set; }
     public string? TinhTrang { get; set; }

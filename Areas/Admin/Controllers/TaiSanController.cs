@@ -6,12 +6,11 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
-using AssetContext = DoAn.Data.DataContext;
 
 namespace DoAn.Areas.Admin.Controllers;
 
 [Area("Admin")]
-public class TaiSanController(AssetContext context, ILogger<TaiSanController> logger) : Controller
+public class TaiSanController(DataContext context, ILogger<TaiSanController> logger) : Controller
 {
     public override void OnActionExecuting(ActionExecutingContext filterContext)
     {
@@ -31,16 +30,16 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
         sort = AssetQueries.Sorts.ContainsKey(sort ?? "") ? sort! : "created_desc";
         ModelState.Remove(nameof(pageSize));
         ModelState.Remove(nameof(sort));
-        var query = AssetQueries.Filter(context.Tbltaisans.AsNoTracking(), keyword, danhMucId, tinhTrang, trangThai);
+        var query = AssetQueries.Filter(context.tblTaiSan.AsNoTracking(), keyword, danhMucId, tinhTrang, trangThai);
         var total = await query.CountAsync();
         page = Math.Clamp(page, 1, Math.Max(1, (int)Math.Ceiling(total / (double)pageSize)));
         return View(new TaiSanIndex
         {
-            Items = await AssetQueries.Sort(query.Include(x => x.Dmts), sort)
+            Items = await AssetQueries.Sort(query.Include(x => x.tblDanhMucTaiSan), sort)
                 .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(),
             Keyword = keyword, DanhMucId = danhMucId, TrangThai = trangThai, TinhTrang = tinhTrang,
             Sort = sort, Page = page, PageSize = pageSize, Total = total,
-            TongNguyenGia = await query.SumAsync(x => (decimal?)x.TsNguyenGia) ?? 0,
+            TongNguyenGia = await query.SumAsync(x => (decimal?)x.TS_NguyenGia) ?? 0,
             DanhMucs = await Categories()
         });
     }
@@ -48,7 +47,7 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
     [HttpGet]
     public async Task<IActionResult> Details([FromRoute] int id)
     {
-        var asset = await context.Tbltaisans.AsNoTracking().Include(x => x.Dmts).FirstOrDefaultAsync(x => x.TsId == id);
+        var asset = await context.tblTaiSan.AsNoTracking().Include(x => x.tblDanhMucTaiSan).FirstOrDefaultAsync(x => x.TS_ID == id);
         return asset == null ? NotFound() : View(asset);
     }
 
@@ -60,17 +59,17 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
     {
         model.Ma = model.Ma?.Trim() ?? "";
         if (model.Ma.Length == 0) ModelState.AddModelError(nameof(model.Ma), "Vui lòng nhập mã tài sản.");
-        if (await context.Tbltaisans.AnyAsync(x => x.TsMaTaiSan == model.Ma))
+        if (await context.tblTaiSan.AnyAsync(x => x.TS_MaTaiSan == model.Ma))
             ModelState.AddModelError(nameof(model.Ma), $"Mã tài sản {model.Ma} đã tồn tại.");
         await ValidateFields(model);
         if (ModelState.IsValid)
         {
             var asset = AssetProfile.Create(model);
-            context.Tbltaisans.Add(asset);
+            context.tblTaiSan.Add(asset);
             if (await Save(model.Ma))
             {
                 TempData["Success"] = "Thêm tài sản thành công.";
-                return RedirectToAction(nameof(Details), new { id = asset.TsId });
+                return RedirectToAction(nameof(Details), new { id = asset.TS_ID });
             }
         }
         model.DanhMucs = await Categories(activeOnly: true);
@@ -80,13 +79,13 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
     [HttpGet]
     public async Task<IActionResult> Edit([FromRoute] int id)
     {
-        var asset = await context.Tbltaisans.FindAsync(id);
+        var asset = await context.tblTaiSan.FindAsync(id);
         if (asset == null) return NotFound();
         var model = new AssetEditViewModel
         {
-            Ten = asset.TsTenTaiSan, DanhMucId = asset.DmtsId, NgayMua = asset.TsNgayMua,
-            NguyenGia = asset.TsNguyenGia, HanBaoHanh = asset.TsHanBaoHanh,
-            TinhTrang = AssetConditions.Normalize(asset.TsTinhTrang), MoTa = asset.TsMoTa, GhiChu = asset.TsGhiChu
+            Ten = asset.TS_TenTaiSan, DanhMucId = asset.DMTS_ID, NgayMua = asset.TS_NgayMua,
+            NguyenGia = asset.TS_NguyenGia, HanBaoHanh = asset.TS_HanBaoHanh,
+            TinhTrang = AssetConditions.Normalize(asset.TS_TinhTrang), MoTa = asset.TS_MoTa, GhiChu = asset.TS_GhiChu
         };
         await PrepareEdit(model, asset);
         return View(model);
@@ -95,7 +94,7 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute] int id, AssetEditViewModel model)
     {
-        var asset = await context.Tbltaisans.FindAsync(id);
+        var asset = await context.tblTaiSan.FindAsync(id);
         if (asset == null) return NotFound();
         await ValidateFields(model);
         if (ModelState.IsValid)
@@ -114,7 +113,7 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
     [HttpGet]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        var asset = await context.Tbltaisans.AsNoTracking().Include(x => x.Dmts).FirstOrDefaultAsync(x => x.TsId == id);
+        var asset = await context.tblTaiSan.AsNoTracking().Include(x => x.tblDanhMucTaiSan).FirstOrDefaultAsync(x => x.TS_ID == id);
         if (asset == null) return NotFound();
         ViewBag.HasHistory = await AssetHistory.HasHistory(context, id);
         return View(asset);
@@ -123,7 +122,7 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
     [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed([FromRoute] int id)
     {
-        var asset = await context.Tbltaisans.Include(x => x.Dmts).FirstOrDefaultAsync(x => x.TsId == id);
+        var asset = await context.tblTaiSan.Include(x => x.tblDanhMucTaiSan).FirstOrDefaultAsync(x => x.TS_ID == id);
         if (asset == null) return NotFound();
         var hasHistory = await AssetHistory.HasHistory(context, id);
         ViewBag.HasHistory = hasHistory;
@@ -132,33 +131,33 @@ public class TaiSanController(AssetContext context, ILogger<TaiSanController> lo
             ModelState.AddModelError("", "Tài sản đã phát sinh nghiệp vụ nên không thể xóa.");
             return View("Delete", asset);
         }
-        context.Tbltaisans.Remove(asset);
+        context.tblTaiSan.Remove(asset);
         if (!await Save()) return View("Delete", asset);
         TempData["Success"] = "Xóa tài sản thành công.";
         return RedirectToAction(nameof(Index));
     }
 
     private async Task<List<SelectListItem>> Categories(bool activeOnly = false, int? currentId = null) =>
-        await context.Tbldanhmuctaisans.AsNoTracking()
-            .Where(x => !activeOnly || x.DmtsTrangThai == true || x.DmtsId == currentId)
-            .OrderBy(x => x.DmtsTenDanhMuc)
-            .Select(x => new SelectListItem(x.DmtsTenDanhMuc + (x.DmtsTrangThai == true ? "" : " (ngừng sử dụng)"),
-                x.DmtsId.ToString())).ToListAsync();
+        await context.tblDanhMucTaiSan.AsNoTracking()
+            .Where(x => !activeOnly || x.DMTS_TrangThai == true || x.DMTS_ID == currentId)
+            .OrderBy(x => x.DMTS_TenDanhMuc)
+            .Select(x => new SelectListItem(x.DMTS_TenDanhMuc + (x.DMTS_TrangThai == true ? "" : " (ngừng sử dụng)"),
+                x.DMTS_ID.ToString())).ToListAsync();
 
     private async Task ValidateFields(AssetFieldsViewModel model)
     {
         model.Ten = model.Ten?.Trim() ?? "";
         if (model.Ten.Length == 0) ModelState.AddModelError(nameof(model.Ten), "Vui lòng nhập tên tài sản.");
-        if (!await context.Tbldanhmuctaisans.AnyAsync(x => x.DmtsId == model.DanhMucId && x.DmtsTrangThai == true))
+        if (!await context.tblDanhMucTaiSan.AnyAsync(x => x.DMTS_ID == model.DanhMucId && x.DMTS_TrangThai == true))
             ModelState.AddModelError(nameof(model.DanhMucId), "Danh mục không tồn tại hoặc đã ngừng sử dụng. Vui lòng chọn danh mục đang hoạt động.");
     }
 
-    private async Task PrepareEdit(AssetEditViewModel model, Tbltaisan asset)
+    private async Task PrepareEdit(AssetEditViewModel model, tblTaiSan asset)
     {
-        model.AssetId = asset.TsId;
-        model.Ma = asset.TsMaTaiSan;
-        model.TrangThai = asset.TsTrangThai;
-        model.DanhMucs = await Categories(activeOnly: true, currentId: asset.DmtsId);
+        model.AssetId = asset.TS_ID;
+        model.Ma = asset.TS_MaTaiSan;
+        model.TrangThai = asset.TS_TrangThai;
+        model.DanhMucs = await Categories(activeOnly: true, currentId: asset.DMTS_ID);
         // Không hiển thị dữ liệu giả được gửi lên thay cho thông tin từ database.
         ModelState.Remove(nameof(model.AssetId));
         ModelState.Remove(nameof(model.Ma));

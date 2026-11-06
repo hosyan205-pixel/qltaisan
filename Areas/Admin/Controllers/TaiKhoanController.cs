@@ -16,7 +16,7 @@ namespace DoAn.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index(string? keyword, string? vaiTro, bool? trangThai)
         {
-            var query = _context.TaiKhoans.AsQueryable();
+            var query = _context.tblTaiKhoan.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -56,7 +56,7 @@ namespace DoAn.Areas.Admin.Controllers
                 return View(tk);
             }
 
-            bool usernameExists = await _context.TaiKhoans.AnyAsync(x => x.TK_TenDangNhap == tk.TK_TenDangNhap);
+            bool usernameExists = await _context.tblTaiKhoan.AnyAsync(x => x.TK_TenDangNhap == tk.TK_TenDangNhap);
 
             if (usernameExists)
             {
@@ -66,7 +66,7 @@ namespace DoAn.Areas.Admin.Controllers
 
             if (!string.IsNullOrWhiteSpace(tk.TK_Email))
             {
-                bool emailExists = await _context.TaiKhoans.AnyAsync(x => x.TK_Email == tk.TK_Email);
+                bool emailExists = await _context.tblTaiKhoan.AnyAsync(x => x.TK_Email == tk.TK_Email);
 
                 if (emailExists)
                 {
@@ -78,7 +78,7 @@ namespace DoAn.Areas.Admin.Controllers
             tk.TK_NgayTao = DateTime.Now;
             tk.TK_MatKhau = BCrypt.Net.BCrypt.HashPassword(tk.TK_MatKhau);
 
-            _context.TaiKhoans.Add(tk);
+            _context.tblTaiKhoan.Add(tk);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
@@ -89,7 +89,7 @@ namespace DoAn.Areas.Admin.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var tk = await _context.TaiKhoans.FindAsync(id);
+            var tk = await _context.tblTaiKhoan.FindAsync(id);
 
             if (tk == null)
                 return NotFound();
@@ -103,12 +103,12 @@ namespace DoAn.Areas.Admin.Controllers
             if (id != tk.TK_ID)
                 return NotFound();
 
-            var existing = await _context.TaiKhoans.FirstOrDefaultAsync(x => x.TK_ID == id);
+            var existing = await _context.tblTaiKhoan.FirstOrDefaultAsync(x => x.TK_ID == id);
 
             if (existing == null)
                 return NotFound();
 
-            bool usernameExists = await _context.TaiKhoans
+            bool usernameExists = await _context.tblTaiKhoan
                 .AnyAsync(x => x.TK_TenDangNhap == tk.TK_TenDangNhap && x.TK_ID != id);
 
             if (usernameExists)
@@ -116,7 +116,7 @@ namespace DoAn.Areas.Admin.Controllers
                 ModelState.AddModelError("TK_TenDangNhap", "Tên đăng nhập đã tồn tại!");
             }
 
-            bool emailExists = await _context.TaiKhoans
+            bool emailExists = await _context.tblTaiKhoan
                 .AnyAsync(x => x.TK_Email == tk.TK_Email && x.TK_ID != id);
 
             if (emailExists)
@@ -154,7 +154,7 @@ namespace DoAn.Areas.Admin.Controllers
             if (id == null || id == 0)
                 return NotFound();
 
-            var tk = await _context.TaiKhoans.FirstOrDefaultAsync(x => x.TK_ID == id);
+            var tk = await _context.tblTaiKhoan.FirstOrDefaultAsync(x => x.TK_ID == id);
 
             if (tk == null)
                 return NotFound();
@@ -165,12 +165,12 @@ namespace DoAn.Areas.Admin.Controllers
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tk = await _context.TaiKhoans.FindAsync(id);
+            var tk = await _context.tblTaiKhoan.FindAsync(id);
 
             if (tk == null)
                 return NotFound();
 
-            _context.TaiKhoans.Remove(tk);
+            _context.tblTaiKhoan.Remove(tk);
 
             await _context.SaveChangesAsync();
 

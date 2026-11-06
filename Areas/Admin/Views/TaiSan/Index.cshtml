@@ -71,15 +71,15 @@
                         @foreach (var asset in Model.Items)
                         {
                             <tr>
-                                <td><a asp-action="Details" asp-route-id="@asset.TsId">@asset.TsMaTaiSan</a></td>
-                                <td>@asset.TsTenTaiSan</td><td>@asset.Dmts.DmtsTenDanhMuc</td>
-                                <td class="text-end text-nowrap">@AssetDisplay.Money(asset.TsNguyenGia)</td>
-                                <td>@AssetDisplay.Label(AssetConditions.Labels, AssetConditions.Normalize(asset.TsTinhTrang))</td>
-                                <td><span class="badge @AssetStatuses.Badge(asset.TsTrangThai)">@AssetDisplay.Label(AssetStatuses.Labels, asset.TsTrangThai)</span></td>
+                                <td><a asp-action="Details" asp-route-id="@asset.TS_ID">@asset.TS_MaTaiSan</a></td>
+                                <td>@asset.TS_TenTaiSan</td><td>@asset.tblDanhMucTaiSan?.DMTS_TenDanhMuc</td>
+                                <td class="text-end text-nowrap">@AssetDisplay.Money(asset.TS_NguyenGia)</td>
+                                <td>@AssetDisplay.Label(AssetConditions.Labels, AssetConditions.Normalize(asset.TS_TinhTrang))</td>
+                                <td><span class="badge @AssetStatuses.Badge(asset.TS_TrangThai)">@AssetDisplay.Label(AssetStatuses.Labels, asset.TS_TrangThai)</span></td>
                                 <td class="text-nowrap">
-                                    <a asp-action="Details" asp-route-id="@asset.TsId" class="btn btn-sm btn-outline-primary">Xem</a>
-                                    <a asp-action="Edit" asp-route-id="@asset.TsId" class="btn btn-sm btn-outline-secondary">Sửa</a>
-                                    <a asp-action="Delete" asp-route-id="@asset.TsId" class="btn btn-sm btn-outline-danger">Xóa</a>
+                                    <a asp-action="Details" asp-route-id="@asset.TS_ID" class="btn btn-sm btn-outline-primary">Xem</a>
+                                    <a asp-action="Edit" asp-route-id="@asset.TS_ID" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                                    <a asp-action="Delete" asp-route-id="@asset.TS_ID" class="btn btn-sm btn-outline-danger">Xóa</a>
                                 </td>
                             </tr>
                         }

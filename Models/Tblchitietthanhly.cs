@@ -1,23 +1,39 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblchitietthanhly
+namespace DoAn.Models
 {
-    public int CttlId { get; set; }
+    [Table("tblchitietthanhly")]
+    public class tblChiTietThanhLy
+    {
+        [Key]
+        [Column("CTTL_ID")]
+        public int CTTL_ID { get; set; }
 
-    public int TlId { get; set; }
+        [Required]
+        [Column("TL_ID")]
+        public int TL_ID { get; set; }
 
-    public int TsId { get; set; }
+        [Required]
+        [Column("TS_ID")]
+        public int TS_ID { get; set; }
 
-    public decimal CttlGiaTriThanhLy { get; set; }
+        [Column("CTTL_GiaTriThanhLy")]
+        public decimal? CTTL_GiaTriThanhLy { get; set; }
 
-    public string? CttlTinhTrang { get; set; }
+        [StringLength(100)]
+        [Column("CTTL_TinhTrang")]
+        public string? CTTL_TinhTrang { get; set; }
 
-    public string? CttlGhiChu { get; set; }
+        [Column("CTTL_GhiChu")]
+        public string? CTTL_GhiChu { get; set; }
 
-    public virtual Tblthanhlytaisan Tl { get; set; } = null!;
+        [ForeignKey("TL_ID")]
+        public virtual tblThanhLyTaiSan? ThanhLy { get; set; }
 
-    public virtual Tbltaisan Ts { get; set; } = null!;
+        [ForeignKey("TS_ID")]
+        public virtual tblTaiSan? TaiSan { get; set; }
+    }
 }

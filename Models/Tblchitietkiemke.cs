@@ -1,25 +1,44 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DoAn.Models;
-
-public partial class Tblchitietkiemke
+namespace DoAn.Models
 {
-    public int CtkkId { get; set; }
+    [Table("tblchitietkiemke")]
+    public class tblChiTietKiemKe
+    {
+        [Key]
+        [Column("CTKK_ID")]
+        public int CTKK_ID { get; set; }
 
-    public int KkId { get; set; }
+        [Required]
+        [Column("KK_ID")]
+        public int KK_ID { get; set; }
 
-    public int TsId { get; set; }
+        [Required]
+        [Column("TS_ID")]
+        public int TS_ID { get; set; }
 
-    public string? CtkkTinhTrangThucTe { get; set; }
+        [StringLength(100)]
+        [Column("CTKK_TinhTrangThucTe")]
+        public string? CTKK_TinhTrangThucTe { get; set; }
 
-    public string? CtkkViTriThucTe { get; set; }
+        [StringLength(255)]
+        [Column("CTKK_ViTriThucTe")]
+        public string? CTKK_ViTriThucTe { get; set; }
 
-    public string CtkkKetQua { get; set; } = null!;
+        [StringLength(50)]
+        [Column("CTKK_KetQua")]
+        public string? CTKK_KetQua { get; set; } = "BinhThuong";
 
-    public string? CtkkGhiChu { get; set; }
+        [Column("CTKK_GhiChu")]
+        public string? CTKK_GhiChu { get; set; }
 
-    public virtual Tblkiemketaisan Kk { get; set; } = null!;
+        [ForeignKey("KK_ID")]
+        public virtual tblKiemKeTaiSan? KiemKe { get; set; }
 
-    public virtual Tbltaisan Ts { get; set; } = null!;
+        [ForeignKey("TS_ID")]
+        public virtual tblTaiSan? TaiSan { get; set; }
+    }
 }

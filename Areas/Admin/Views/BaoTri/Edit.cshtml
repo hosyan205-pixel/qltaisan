@@ -1,0 +1,95 @@
+@using DoAn.Areas.Admin.Controllers
+@model DoAn.Models.tblBaoTriTaiSan
+
+@{
+    ViewData["Title"] = "Cập nhật phiếu bảo trì";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Cập nhật phiếu bảo trì</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="BaoTri" asp-action="Index">Quản lý bảo trì</a></li>
+                <li class="breadcrumb-item active">@Model.BT_MaPhieu</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Thông tin phiếu bảo trì</h2>
+            <form asp-area="Admin" asp-controller="BaoTri" asp-action="Edit" asp-route-id="@Model.BT_ID" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+                <input type="hidden" asp-for="BT_ID" />
+                <input type="hidden" asp-for="BT_NguoiLapID" />
+
+                <div class="col-md-6">
+                    <label asp-for="BT_MaPhieu" class="form-label">Mã phiếu bảo trì</label>
+                    <input asp-for="BT_MaPhieu" class="form-control" maxlength="30" required />
+                    <span asp-validation-for="BT_MaPhieu" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="TS_ID" class="form-label">Tài sản bảo trì</label>
+                    <select asp-for="TS_ID" asp-items="ViewBag.TaiSans" class="form-select" required></select>
+                    <span asp-validation-for="TS_ID" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="BT_NgayBaoTri" class="form-label">Ngày bảo trì</label>
+                    <input asp-for="BT_NgayBaoTri" type="date" class="form-control" />
+                    <span asp-validation-for="BT_NgayBaoTri" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="BT_NgayHoanThanh" class="form-label">Ngày hoàn thành</label>
+                    <input asp-for="BT_NgayHoanThanh" type="date" class="form-control" />
+                    <span asp-validation-for="BT_NgayHoanThanh" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="BT_TrangThai" class="form-label">Trạng thái</label>
+                    <select asp-for="BT_TrangThai" class="form-select">
+                        @foreach (var item in BaoTriController.TrangThaiLabels)
+                        {
+                            <option value="@item.Key">@item.Value</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="BT_DonViBaoTri" class="form-label">Đơn vị bảo trì</label>
+                    <input asp-for="BT_DonViBaoTri" class="form-control" maxlength="150" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="BT_ChiPhi" class="form-label">Chi phí bảo trì (VNĐ)</label>
+                    <input asp-for="BT_ChiPhi" type="number" step="1000" min="0" class="form-control" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="BT_LyDo" class="form-label">Lý do bảo trì</label>
+                    <textarea asp-for="BT_LyDo" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="BT_NoiDung" class="form-label">Nội dung thực hiện</label>
+                    <textarea asp-for="BT_NoiDung" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="BT_GhiChu" class="form-label">Ghi chú</label>
+                    <textarea asp-for="BT_GhiChu" class="form-control" rows="2"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <a asp-area="Admin" asp-controller="BaoTri" asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>

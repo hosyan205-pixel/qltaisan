@@ -1,0 +1,60 @@
+@model DoAn.Models.tblDanhMucTaiSan
+
+@{
+    ViewData["Title"] = "Cập nhật danh mục tài sản";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Cập nhật danh mục tài sản</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="DanhMuc" asp-action="Index">Quản lý danh mục tài sản</a></li>
+                <li class="breadcrumb-item active">@Model.DMTS_MaDanhMuc</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Thông tin danh mục tài sản</h2>
+            <form asp-area="Admin" asp-controller="DanhMuc" asp-action="Edit" asp-route-id="@Model.DMTS_ID" method="post" class="row g-3">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+                <input type="hidden" asp-for="DMTS_ID" />
+                <input type="hidden" asp-for="DMTS_NgayTao" />
+
+                <div class="col-md-6">
+                    <label asp-for="DMTS_MaDanhMuc" class="form-label">Mã danh mục</label>
+                    <input asp-for="DMTS_MaDanhMuc" class="form-control" maxlength="30" required />
+                    <span asp-validation-for="DMTS_MaDanhMuc" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="DMTS_TenDanhMuc" class="form-label">Tên danh mục</label>
+                    <input asp-for="DMTS_TenDanhMuc" class="form-control" maxlength="100" required />
+                    <span asp-validation-for="DMTS_TenDanhMuc" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="DMTS_TrangThai" class="form-label">Trạng thái</label>
+                    <select asp-for="DMTS_TrangThai" class="form-select">
+                        <option value="true">Hoạt động</option>
+                        <option value="false">Ngừng hoạt động</option>
+                    </select>
+                </div>
+
+                <div class="col-12">
+                    <label asp-for="DMTS_MoTa" class="form-label">Mô tả</label>
+                    <textarea asp-for="DMTS_MoTa" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                    <a asp-area="Admin" asp-controller="DanhMuc" asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>

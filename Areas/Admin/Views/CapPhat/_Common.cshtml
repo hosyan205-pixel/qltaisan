@@ -1,0 +1,42 @@
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-controller="CapPhat" asp-action="Index" asp-route-id="" class="btn btn-outline-primary">Danh sách phiếu giao</a>
+    <a asp-controller="CapPhat" asp-action="ActiveAssignments" asp-route-id="" class="btn btn-outline-secondary">Tài sản đang giữ</a>
+    @if(ViewData["CanManage"] is not false){
+        <a asp-controller="CapPhat" asp-action="Create" asp-route-id="" class="btn btn-primary">Lập phiếu giao</a>
+        <a asp-controller="CapPhat" asp-action="Reconciliation" asp-route-id="" class="btn btn-outline-warning">Cần đối soát</a>
+    }
+</div>
+<div class="alert alert-warning" role="note">
+    Phiếu lịch sử chưa xác minh được đánh dấu Cần đối soát.
+    Không dùng tên người nhận hoặc ngày thu hồi trống của các phiếu này để kết luận trách nhiệm hiện tại.
+</div>
+
+@if (TempData["Success"] is string success) { <div class="alert alert-success" role="status">@success</div> }
+@if (TempData["Error"] is string error) { <div class="alert alert-danger" role="alert">@error</div> }
+<div class="modal fade" id="business-confirmation" tabindex="-1" aria-labelledby="business-confirmation-title" aria-hidden="true">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title fs-5" id="business-confirmation-title">Xác nhận thao tác</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button></div>
+        <div class="modal-body" id="business-confirmation-message"></div>
+        <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Quay lại</button><button type="button" class="btn btn-primary" id="business-confirmation-accept">Xác nhận</button></div>
+    </div></div>
+</div>
+<script>
+(() => {
+    let pending;
+    document.addEventListener('submit', e => {
+        const form = e.target.closest('form[data-confirm]');
+        if (!form || form.dataset.accepted === 'yes') return;
+        e.preventDefault();
+        pending = form;
+        document.getElementById('business-confirmation-message').textContent = form.dataset.confirm;
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('business-confirmation')).show();
+    });
+    document.getElementById('business-confirmation-accept')?.addEventListener('click', () => {
+        if (!pending) return;
+        pending.dataset.accepted = 'yes';
+        bootstrap.Modal.getOrCreateInstance(document.getElementById('business-confirmation')).hide();
+        pending.requestSubmit();
+        pending = null;
+    });
+})();
+</script>

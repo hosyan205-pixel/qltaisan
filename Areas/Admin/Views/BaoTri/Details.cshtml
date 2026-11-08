@@ -1,0 +1,80 @@
+@using DoAn.Areas.Admin.Controllers
+@model DoAn.Models.tblBaoTriTaiSan
+
+@{
+    ViewData["Title"] = "Chi tiết phiếu bảo trì";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Chi tiết phiếu bảo trì</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="BaoTri" asp-action="Index">Quản lý bảo trì</a></li>
+                <li class="breadcrumb-item active">@Model.BT_MaPhieu</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h2 class="card-title mb-0">Phiếu bảo trì: @Model.BT_MaPhieu</h2>
+                <div class="d-flex gap-2">
+                    <a asp-area="Admin" asp-controller="BaoTri" asp-action="Edit" asp-route-id="@Model.BT_ID" class="btn btn-primary">Sửa phiếu</a>
+                    <a asp-area="Admin" asp-controller="BaoTri" asp-action="Index" class="btn btn-outline-secondary">Quay lại</a>
+                </div>
+            </div>
+
+            <dl class="row mb-0">
+                <dt class="col-sm-3 text-muted">Mã phiếu</dt>
+                <dd class="col-sm-9"><strong>@Model.BT_MaPhieu</strong></dd>
+
+                <dt class="col-sm-3 text-muted">Tài sản bảo trì</dt>
+                <dd class="col-sm-9">
+                    @if (Model.TaiSan != null)
+                    {
+                        <a asp-area="Admin" asp-controller="TaiSan" asp-action="Details" asp-route-id="@Model.TS_ID">
+                            @Model.TaiSan.TS_MaTaiSan - @Model.TaiSan.TS_TenTaiSan
+                        </a>
+                    }
+                    else
+                    {
+                        <span>Mã TS #@Model.TS_ID</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3 text-muted">Trạng thái</dt>
+                <dd class="col-sm-9">
+                    <span class="badge @BaoTriController.BadgeClass(Model.BT_TrangThai)">
+                        @BaoTriController.StatusLabel(Model.BT_TrangThai)
+                    </span>
+                </dd>
+
+                <dt class="col-sm-3 text-muted">Ngày bảo trì</dt>
+                <dd class="col-sm-9">@(Model.BT_NgayBaoTri?.ToString("dd/MM/yyyy") ?? "-")</dd>
+
+                <dt class="col-sm-3 text-muted">Ngày hoàn thành</dt>
+                <dd class="col-sm-9">@(Model.BT_NgayHoanThanh?.ToString("dd/MM/yyyy") ?? "-")</dd>
+
+                <dt class="col-sm-3 text-muted">Đơn vị bảo trì</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.BT_DonViBaoTri) ? "-" : Model.BT_DonViBaoTri)</dd>
+
+                <dt class="col-sm-3 text-muted">Chi phí</dt>
+                <dd class="col-sm-9"><strong>@string.Format("{0:N0} đ", Model.BT_ChiPhi ?? 0)</strong></dd>
+
+                <dt class="col-sm-3 text-muted">Lý do bảo trì</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.BT_LyDo) ? "-" : Model.BT_LyDo)</dd>
+
+                <dt class="col-sm-3 text-muted">Nội dung thực hiện</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.BT_NoiDung) ? "-" : Model.BT_NoiDung)</dd>
+
+                <dt class="col-sm-3 text-muted">Ghi chú</dt>
+                <dd class="col-sm-9">@(string.IsNullOrWhiteSpace(Model.BT_GhiChu) ? "-" : Model.BT_GhiChu)</dd>
+
+                <dt class="col-sm-3 text-muted">Người lập phiếu</dt>
+                <dd class="col-sm-9">@(Model.NguoiLap?.TK_TenDangNhap ?? $"Tài khoản #{Model.BT_NguoiLapID}")</dd>
+            </dl>
+        </div>
+    </div>
+</main>

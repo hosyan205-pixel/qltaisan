@@ -1,0 +1,29 @@
+@model GiaoNhanResolutionForm
+@{ ViewData["Title"]=Model.Inspection?"Kiểm tra sau tiếp nhận":Model.Lost?"Ghi nhận tìm thấy":"Ghi nhận tình trạng / báo mất";var action=Model.Inspection?"Inspect":Model.Lost?"ResolveLoss":"RecordCondition";var route=Model.Inspection?Model.AssetId:Model.LineId; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>@ViewData["Title"]</h1></div>
+    <partial name="_Common" />
+    <div class="card"><div class="card-body">
+        <h2 class="card-title">@Model.Code · @Model.Name</h2>
+        <p>Hiện tại: @GiaoNhanUi.Condition(Model.ExpectedCondition) · @GiaoNhanUi.AssetState(Model.ExpectedState).</p>
+        @if(!Model.Inspection){<div class="alert alert-warning">Báo mất hoặc tìm thấy không kết thúc trách nhiệm và không được ghi thành đã nhận lại hiện vật. Thực hiện thu hồi riêng khi thật sự tiếp nhận.</div>}
+        <form asp-action="@action" asp-route-id="@route" method="post" data-confirm="Xác nhận thông tin thực tế và lưu sự việc/kiểm tra vào lịch sử?">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            <input asp-for="RequestKey" type="hidden" /><input asp-for="ExpectedCondition" type="hidden" /><input asp-for="ExpectedState" type="hidden" />
+                <div class="mb-3"><label asp-for="TinhTrang" class="form-label">Tình trạng kiểm tra thực tế</label><select asp-for="TinhTrang" class="form-select">@foreach(var condition in GiaoNhanStates.ReturnConditions){<option value="@condition">@GiaoNhanUi.Condition(condition)</option>}</select></div>
+                <div class="form-check mb-3"><input asp-for="DaKiemTraThucTe" class="form-check-input" /><label asp-for="DaKiemTraThucTe" class="form-check-label">Tôi đã kiểm tra thực tế và chịu trách nhiệm về thông tin ghi nhận.</label></div>
+            <div class="mb-3"><label asp-for="LyDo" class="form-label">Lý do / kết quả kiểm tra / căn cứ</label><textarea asp-for="LyDo" name="lyDo" class="form-control" maxlength="2000" rows="3" required></textarea></div>
+            <button class="btn btn-primary">Lưu ghi nhận</button><a asp-action="Details" asp-route-id="@Model.ReceiptId" class="btn btn-outline-secondary">Quay lại phiếu</a>
+        </form>
+        @if(!Model.Lost&&!Model.Inspection)
+        {
+            <hr /><h2 class="card-title">Báo mất tài sản đang giữ</h2>
+            <form asp-action="ReportLost" asp-route-id="@Model.LineId" method="post" data-confirm="Ghi nhận báo mất? Trách nhiệm vẫn giữ nguyên và tài sản bị chặn chuyển giao, thu hồi cho đến khi tìm thấy.">
+                <input type="hidden" name="requestKey" value="@Guid.NewGuid().ToString("D")" /><input type="hidden" name="expectedCondition" value="@Model.ExpectedCondition" />
+                <label for="lost-reason" class="form-label">Căn cứ / diễn biến mất</label><textarea id="lost-reason" name="lyDo" class="form-control mb-3" maxlength="2000" required></textarea>
+                <button class="btn btn-outline-danger">Xác nhận báo mất</button>
+            </form>
+        }
+    </div></div>
+</main>
+

@@ -43,6 +43,8 @@ namespace DoAn.Models
 
         [Column("TK_NgayTao")]
         public DateTime TK_NgayTao { get; set; } = DateTime.Now;
+        public int? PB_ID { get; set; }
+        public virtual tblPhongBan? PhongBanLamViec { get; set; }
 
         public virtual ICollection<tblBaoTriTaiSan> tblBaoTriTaiSans { get; set; } = new List<tblBaoTriTaiSan>();
         public virtual ICollection<tblCapPhatTaiSan> tblCapPhatTaiSans { get; set; } = new List<tblCapPhatTaiSan>();

@@ -1,6 +1,8 @@
 @using DoAn.Areas.Admin.Models
 @using DoAn.Services.Assets
 @model AssetFieldsViewModel
+<div class="col-md-6"><label asp-for="Serial" class="form-label"></label><input asp-for="Serial" class="form-control" maxlength="100" /><span asp-validation-for="Serial" class="text-danger"></span></div>
+<div class="col-md-6"><label asp-for="ViTri" class="form-label"></label><input asp-for="ViTri" class="form-control" maxlength="150" /><span asp-validation-for="ViTri" class="text-danger"></span></div>
 @if (!Model.DanhMucs.Any())
 {
     <div class="col-12"><div class="alert alert-warning">Chưa có danh mục đang hoạt động. Vui lòng bổ sung danh mục trước khi thêm tài sản.</div></div>
@@ -28,7 +30,7 @@
 </div>
 <div class="col-md-6">
     <label asp-for="TinhTrang" class="form-label"></label>
-    <select asp-for="TinhTrang" class="form-select">@foreach (var item in AssetConditions.Labels) { <option value="@item.Key">@item.Value</option> }</select>
+    <select asp-for="TinhTrang" class="form-select">@foreach (var item in AssetConditions.Labels) { <option value="@item.Key">@item.Value</option> }@if(!AssetConditions.Labels.ContainsKey(Model.TinhTrang)){<option value="@Model.TinhTrang">@GiaoNhanUi.Condition(Model.TinhTrang)</option>}</select>
     <span asp-validation-for="TinhTrang" class="text-danger"></span>
 </div>
 <div class="col-12">

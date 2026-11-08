@@ -1,0 +1,149 @@
+@model GiaoNhanForm
+@{
+    var action = Model.DocumentId.HasValue ? "EditDraft" : Model.Kind == "ThuHoi" ? "CreateReturn" : Model.Kind == "Chuyen" ? "CreateTransfer" : "Create";
+    ViewData["Title"] = (Model.DocumentId.HasValue ? "Sửa nháp — " : "Lập phiếu — ") + GiaoNhanUi.Kind(Model.Kind);
+}
+<main id="main" class="main">
+    <div class="pagetitle"><h1>@ViewData["Title"]</h1></div>
+    <partial name="_Common" />
+    <form asp-action="@action" asp-route-id="@Model.DocumentId" method="post" asp-antiforgery="false" id="receipt-form">
+        @Html.AntiForgeryToken()
+        <input asp-for="RequestKey" type="hidden" /><input asp-for="PhienBan" type="hidden" /><input asp-for="PhieuGocId" type="hidden" />
+        <div class="card"><div class="card-body">
+            <h2 class="card-title">Thông tin phiếu</h2>
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+            }
+            @if (Model.Kind != "Giao")
+            {
+                <div class="alert alert-info">Phiếu nguồn: <strong>@Model.SourceCode</strong> · @(Model.SourceHolderVerified ? "Người chịu trách nhiệm đã xác minh" : "Người nhận ghi trên phiếu, chưa xác minh"): <strong>@Model.SourceHolder</strong> · Phòng ban: @Model.SourceDepartment. Trách nhiệm hiện tại chỉ thay đổi khi xác nhận thực tế.
+                    @if (Model.SourceHolderVerified && Model.SourceRecordedHolder != Model.SourceHolder) { <div>Tên lưu trên phiếu gốc: <strong>@Model.SourceRecordedHolder</strong>.</div> }
+                </div>
+            }
+            <div class="row g-3">
+                @if (Model.Kind != "ThuHoi")
+                {
+                    <div class="col-md-6"><label asp-for="NguoiNhanId" class="form-label">Người nhận / đại diện chịu trách nhiệm</label>
+                        <select asp-for="NguoiNhanId" class="form-select" id="recipient"><option value="">Chọn người nhận</option>
+                            @foreach (var person in Model.People) { <option value="@person.Id" data-department="@person.DepartmentId" disabled="@(!person.Active)">@person.Name @(person.Active ? "— " + person.DepartmentName : "(" + person.UnavailableReason + ")")</option> }
+                        </select><span asp-validation-for="NguoiNhanId" class="text-danger"></span>
+                        <small class="text-muted">Quản trị cập nhật phòng ban tại <a asp-controller="TaiKhoan" asp-action="Index">Quản lý tài khoản</a>. Dữ liệu lịch sử không được tự động gán theo tên.</small>
+                        @if (!Model.People.Any(x => x.Active))
+                        {
+                            <div class="alert alert-warning mt-2" role="alert">Chưa có tài khoản đủ điều kiện nhận tài sản. Vào <a asp-controller="TaiKhoan" asp-action="Index">Quản lý tài khoản</a> → Sửa người nhận → gán đúng phòng ban làm việc và kiểm tra tài khoản đang hoạt động. Sau khi lưu, tải lại phiếu này.</div>
+                        }
+                    </div>
+                    <div class="col-md-6"><label asp-for="PhongBanId" class="form-label">Phòng ban nhận</label><select asp-for="PhongBanId" asp-items="Model.Departments" class="form-select" id="recipient-department"><option value="">Chọn phòng ban</option></select></div>
+                    <div class="col-md-4"><label asp-for="LoaiDoiTuong" class="form-label">Đối tượng chịu trách nhiệm</label><select asp-for="LoaiDoiTuong" class="form-select"><option value="CaNhan">Cá nhân</option><option value="PhongBan">Phòng ban có đại diện</option></select></div>
+                }
+                else
+                {
+                    <input asp-for="PhongBanId" type="hidden" /><input asp-for="LoaiDoiTuong" type="hidden" />
+                    <p class="col-12 text-muted">Người tiếp nhận là quản trị viên đang thực hiện xác nhận, được hệ thống ghi nhận tự động.</p>
+                }
+                <div class="col-md-4"><label asp-for="NgayDuKien" class="form-label">Ngày dự kiến thực hiện</label><input asp-for="NgayDuKien" type="date" class="form-control" /></div>
+                @if (Model.Kind != "ThuHoi") { <div class="col-md-4"><label asp-for="NgayTraDuKien" class="form-label">Hạn trả (nếu giao tạm)</label><input asp-for="NgayTraDuKien" type="date" class="form-control" /></div> }
+                <div class="col-md-6"><label asp-for="LyDo" class="form-label">@(Model.Kind == "ThuHoi" ? "Lý do thu hồi" : Model.Kind == "Chuyen" ? "Lý do chuyển giao" : "Mục đích sử dụng")</label><textarea asp-for="LyDo" class="form-control" rows="2" maxlength="2000" required></textarea><span asp-validation-for="LyDo" class="text-danger"></span></div>
+                <div class="col-md-6"><label asp-for="GhiChu" class="form-label">Ghi chú</label><textarea asp-for="GhiChu" class="form-control" rows="2" maxlength="4000"></textarea></div>
+            </div>
+        </div></div>
+        <div class="card"><div class="card-body">
+            <h2 class="card-title">Danh sách tài sản <small class="text-muted">(tối đa 100 dòng mỗi phiếu)</small></h2>
+            @if (Model.Kind == "Giao")
+            {
+                <p class="text-muted">Lưu nháp chưa cấp phát hoặc đặt chỗ tài sản. Tính sẵn sàng được kiểm tra lại khi xác nhận.</p>
+                <div id="asset-message" class="text-danger mb-2" role="status"></div>
+                <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Tài sản đã chọn</th><th>Ghi chú giao</th><th>Phụ kiện</th><th></th></tr></thead><tbody id="selected-assets">
+                @for (var i = 0; i < Model.Dongs.Count; i++)
+                {
+                    var asset = Model.SelectedAssets[i];
+                    <tr data-asset="@asset.Id"><td><strong>@asset.Code</strong><br />@asset.Name
+                        <input asp-for="Dongs[i].TaiSanId" type="hidden" /><input asp-for="Dongs[i].Chon" type="hidden" />
+                        @if (asset.UnavailableReason != null) { <div class="text-danger">@asset.UnavailableReason</div> }
+                    </td><td><input asp-for="Dongs[i].GhiChu" class="form-control" maxlength="2000" /></td><td><input asp-for="Dongs[i].PhuKien" class="form-control" maxlength="4000" /></td><td><button type="button" class="btn btn-sm btn-outline-danger asset-remove">Bỏ chọn</button></td></tr>
+                }
+                </tbody></table></div>
+                <div class="row g-2 mb-3"><div class="col-md-8"><label for="asset-search" class="form-label">Tìm theo mã, tên hoặc serial</label><input type="search" id="asset-search" class="form-control" maxlength="150" /></div><div class="col-md-4 d-flex align-items-end"><button type="button" id="asset-search-button" class="btn btn-outline-primary">Tìm tài sản</button></div></div>
+                <div id="asset-options" data-url="@Url.Action("AssetChoices")" aria-live="polite"></div>
+            }
+            else
+            {
+                <div class="form-check mb-3"><input type="checkbox" id="select-all-sources" class="form-check-input" /><label for="select-all-sources" class="form-check-label">Chọn tất cả dòng còn hiệu lực</label></div>
+                <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Chọn</th><th>Tài sản / tình trạng giao</th><th>@(Model.Kind == "ThuHoi" ? "Tình trạng khi nhận" : "Tình trạng hiện tại")</th><th>Phụ kiện / ghi chú</th></tr></thead><tbody>
+                @if (Model.Sources.Count == 0) { <tr><td colspan="4">Không có dòng cấp phát hiệu lực đã xác minh. Kiểm tra trang đối soát hoặc tải lại phiếu.</td></tr> }
+                @for (var i = 0; i < Model.Sources.Count; i++)
+                {
+                    var source = Model.Sources[i];
+                    var transferBlocked = Model.Kind == "Chuyen" && source.TransferBlockReasons.Any();
+                    <tr><td><input asp-for="Dongs[i].Chon" class="form-check-input source-check" disabled="@transferBlocked" /><input asp-for="Dongs[i].TaiSanId" type="hidden" /><input asp-for="Dongs[i].DongNguonId" type="hidden" /></td>
+                        <td><strong>@source.Code</strong><br />@source.Name<br /><small>Giao: @GiaoNhanUi.Condition(source.ConditionWhenGiven)</small></td>
+                        <td>@if (Model.Kind == "ThuHoi")
+                            {
+                                <select asp-for="Dongs[i].TinhTrangNhan" class="form-select"><option value="">Chọn tình trạng nhận lại</option>@foreach (var condition in GiaoNhanStates.ReturnConditions) { <option value="@condition">@GiaoNhanUi.Condition(condition)</option> }</select>
+                                <input asp-for="Dongs[i].ViTri" class="form-control mt-2" placeholder="Vị trí tiếp nhận (nếu có)" maxlength="150" />
+                            }
+                            else
+                            {
+                                <span>@GiaoNhanUi.Condition(source.CurrentCondition)</span>
+                                @foreach (var reason in source.TransferBlockReasons) { <div class="text-danger mt-1">@reason</div> }
+                            }
+                        </td>
+                        <td><input asp-for="Dongs[i].PhuKien" class="form-control mb-2" placeholder="Phụ kiện thực tế / phụ kiện thiếu" maxlength="4000" /><input asp-for="Dongs[i].GhiChu" class="form-control" placeholder="Ghi chú kiểm tra" maxlength="2000" /></td></tr>
+                }
+                </tbody></table></div>
+                @if (Model.Kind == "ThuHoi") { <p class="text-muted">Tài sản báo mất được xử lý bằng sự việc riêng; không ghi là đã nhận hiện vật. Các dòng không chọn vẫn giữ nguyên trách nhiệm.</p> }
+            }
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary">Lưu phiếu nháp</button>
+                <a asp-action="@(Model.DocumentId.HasValue ? "Details" : "Index")" asp-route-id="@Model.DocumentId" class="btn btn-outline-secondary">Quay lại</a>
+            </div>
+        </div></div>
+    </form>
+</main>
+<script>
+(() => {
+    document.getElementById('recipient')?.addEventListener('change', e => {
+        const option = e.target.selectedOptions[0];
+        document.getElementById('recipient-department').value = option?.dataset.department || '';
+    });
+    document.getElementById('select-all-sources')?.addEventListener('change', e => document.querySelectorAll('.source-check:not(:disabled)').forEach(x => x.checked = e.target.checked));
+    const options = document.getElementById('asset-options'), selected = document.getElementById('selected-assets'), message = document.getElementById('asset-message');
+    if (!options || !selected) return;
+    function reindex() {
+        [...selected.rows].forEach((row, i) => row.querySelectorAll('input').forEach(input => input.name = input.name.replace(/Dongs\[\d+\]/, 'Dongs[' + i + ']')));
+    }
+    async function load(url) {
+        options.setAttribute('aria-busy', 'true');
+        try {
+            const response = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!response.ok || response.redirected) throw new Error();
+            options.innerHTML = await response.text();
+        } catch { options.textContent = 'Không thể tải danh sách. Kiểm tra kết nối hoặc đăng nhập lại.'; }
+        finally { options.removeAttribute('aria-busy'); }
+    }
+    document.getElementById('asset-search-button').addEventListener('click', () => load(options.dataset.url + '?keyword=' + encodeURIComponent(document.getElementById('asset-search').value)));
+    document.getElementById('asset-search').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); document.getElementById('asset-search-button').click(); } });
+    options.addEventListener('click', e => {
+        const page = e.target.closest('.asset-page'); if (page) { load(page.dataset.url); return; }
+        const button = e.target.closest('.asset-add'); if (!button || button.disabled) return;
+        const id = button.dataset.id;
+        if ([...selected.rows].some(x => x.dataset.asset === id)) { message.textContent = 'Tài sản đã có trong danh sách.'; return; }
+        if (selected.rows.length >= 100) { message.textContent = 'Mỗi phiếu tối đa 100 tài sản.'; return; }
+        message.textContent = '';
+        const row = document.createElement('tr'); row.dataset.asset = id;
+        const title = row.insertCell(); const strong = document.createElement('strong'); strong.textContent = button.dataset.code; title.append(strong, document.createElement('br'), document.createTextNode(button.dataset.name));
+        function field(cell, name, value, type, max) {
+            const input = document.createElement('input'); input.name = 'Dongs[0].' + name; input.value = value; input.type = type;
+            if (type !== 'hidden') input.className = 'form-control'; if (max) input.maxLength = max; cell.append(input);
+        }
+        field(title, 'TaiSanId', id, 'hidden'); field(title, 'Chon', 'true', 'hidden');
+        field(row.insertCell(), 'GhiChu', '', 'text', 2000); field(row.insertCell(), 'PhuKien', '', 'text', 4000);
+        const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'btn btn-sm btn-outline-danger asset-remove'; remove.textContent = 'Bỏ chọn'; row.insertCell().append(remove);
+        selected.append(row); reindex();
+    });
+    selected.addEventListener('click', e => { const button = e.target.closest('.asset-remove'); if (button) { button.closest('tr').remove(); reindex(); } });
+    load(options.dataset.url);
+})();
+</script>
+

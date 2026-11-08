@@ -21,6 +21,7 @@
                     @Html.AntiForgeryToken()
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                     <div class="row g-3">
+                        <div class="col-md-6"><label asp-for="PB_ID" class="form-label fw-bold">Phòng ban làm việc</label><select asp-for="PB_ID" asp-items="ViewBag.Departments" class="form-select"><option value="">Chưa xác minh phòng ban</option></select><span asp-validation-for="PB_ID" class="text-danger"></span><small>Chỉ tài khoản có phòng ban hợp lệ mới được nhận tài sản mới.</small></div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Tên đăng nhập</label>

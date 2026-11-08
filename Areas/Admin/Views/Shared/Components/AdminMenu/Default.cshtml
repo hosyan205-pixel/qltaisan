@@ -1,46 +1,51 @@
 @using DoAn.Areas.Admin.Models
 @model IList<AdminMenu>
+@{
+    // Tên controller cũ trong database vẫn dẫn tới module giao/thu hồi hiện tại.
+    string MenuController(string? name) => string.Equals(name, "BanGiao", StringComparison.OrdinalIgnoreCase) ? "CapPhat" : name ?? "";
+    string MenuArea(AdminMenu item) => string.IsNullOrWhiteSpace(item.AreaName) ? "Admin" : item.AreaName;
+    bool IsCurrent(AdminMenu item) =>
+        string.Equals(MenuController(item.ControllerName), ViewContext.RouteData.Values["controller"]?.ToString(), StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(MenuArea(item), ViewContext.RouteData.Values["area"]?.ToString(), StringComparison.OrdinalIgnoreCase);
+}
 
+@if(Context.Items["GiaoNhanCanManage"] is false)
+{
+    <aside id="sidebar" class="sidebar"><ul class="sidebar-nav" id="sidebar-nav">
+        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-grid"></i><span>Trang chủ</span></a></li>
+        <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="CapPhat" asp-action="Index"><i class="bi bi-file-text"></i><span>Phiếu liên quan đến tôi</span></a></li>
+        <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="CapPhat" asp-action="ActiveAssignments"><i class="bi bi-box"></i><span>Tài sản đang giữ</span></a></li>
+    </ul></aside>
+}
+else
+{
 <aside id="sidebar" class="sidebar">
     <ul class="sidebar-nav" id="sidebar-nav">
 
-        <li class="nav-item">
-            <a class="nav-link" asp-area="Admin" asp-controller="Home" asp-action="Index">
-                <i class="bi bi-grid"></i>
-                <span>Trang chủ</span>
-            </a>
-        </li>
-
-        @if (!Model.Any(m => string.Equals(m.ControllerName, "TaiSan", StringComparison.OrdinalIgnoreCase)))
+        @foreach (var item in Model.Where(m => m.ParentLevel == 0 && m.IsActive == true).OrderBy(m => m.ItemOrder).ThenBy(m => m.AdminMenuID))
         {
-            <li class="nav-item">
-                <a class="nav-link collapsed" asp-area="Admin" asp-controller="TaiSan" asp-action="Index">
-                    <i class="bi bi-box-seam"></i><span>Quản lý tài sản</span>
-                </a>
-            </li>
-        }
-
-        @foreach (var item in Model.Where(m => m.ItemLevel == 1).OrderBy(m => m.ItemOrder))
-        {
-            var sMenu = Model.Where(m => m.ParentLevel == item.AdminMenuID)
-            .OrderBy(m => m.ItemOrder).ToList();
+            var sMenu = Model.Where(m => m.ParentLevel == item.AdminMenuID && m.IsActive == true)
+                .OrderBy(m => m.ItemOrder).ThenBy(m => m.AdminMenuID).ToList();
+            var active = IsCurrent(item) || sMenu.Any(IsCurrent);
+            var collapseId = !string.IsNullOrWhiteSpace(item.IdName) ? item.IdName
+                : !string.IsNullOrWhiteSpace(item.ItemTarget) ? item.ItemTarget : "admin-menu-" + item.AdminMenuID;
 
             <li class="nav-item">
 
                 @if (sMenu.Any())
                 {
-                    <a class="nav-link collapsed" data-bs-target="#@item.ItemTarget" data-bs-toggle="collapse" href="#">
+                    <a class="@(active ? "nav-link" : "nav-link collapsed")" data-bs-target="#@collapseId" data-bs-toggle="collapse" href="#@collapseId" aria-expanded="@(active ? "true" : "false")">
                         <i class="@item.Icon"></i>
                         <span>@item.ItemName</span>
                         <i class="bi bi-chevron-down ms-auto"></i>
                     </a>
 
-                    <ul id="@item.IdName" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+                    <ul id="@collapseId" class="@(active ? "nav-content collapse show" : "nav-content collapse")" data-bs-parent="#sidebar-nav">
 
                         @foreach (var smn in sMenu)
                         {
                             <li>
-                                <a href="/Admin/@smn.ControllerName/@smn.ActionName">
+                                <a asp-area="@MenuArea(smn)" asp-controller="@MenuController(smn.ControllerName)" asp-action="@(smn.ActionName ?? "Index")" asp-route-id="" class="@(IsCurrent(smn) ? "active" : null)">
                                     <i class="bi bi-circle"></i>
                                     <span>@smn.ItemName</span>
                                 </a>
@@ -50,12 +55,10 @@
                 }
                 else
                 {
-                    <li class="nav-item">
-                        <a class="nav-link collapsed" href="/Admin/@item.ControllerName/@item.ActionName">
-                            <i class="@item.Icon"></i>
-                            <span>@item.ItemName</span>
-                        </a>
-                    </li>
+                    <a class="@(active ? "nav-link" : "nav-link collapsed")" asp-area="@MenuArea(item)" asp-controller="@MenuController(item.ControllerName)" asp-action="@(item.ActionName ?? "Index")" asp-route-id="">
+                        <i class="@item.Icon"></i>
+                        <span>@item.ItemName</span>
+                    </a>
                 }
 
             </li>
@@ -63,3 +66,4 @@
 
     </ul>
 </aside>
+}

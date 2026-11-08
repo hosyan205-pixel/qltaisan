@@ -1,0 +1,138 @@
+@using DoAn.Areas.Admin.Controllers
+@model IEnumerable<DoAn.Models.tblBaoTriTaiSan>
+
+@{
+    ViewData["Title"] = "Quản lý bảo trì tài sản";
+    decimal tongChiPhi = ViewBag.TongChiPhi ?? 0m;
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý bảo trì tài sản</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Bảo trì tài sản</li>
+            </ol>
+        </nav>
+    </div>
+
+    @if (TempData["Success"] is string message)
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    @if (TempData["Error"] is string errorMsg)
+    {
+        <div class="alert alert-danger" role="alert">@errorMsg</div>
+    }
+
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h2 class="card-title mb-0">Danh sách phiếu bảo trì</h2>
+                    <a asp-area="Admin" asp-controller="BaoTri" asp-action="Create" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm phiếu bảo trì
+                    </a>
+                </div>
+
+                <form method="get" asp-area="Admin" asp-controller="BaoTri" asp-action="Index" class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Từ khóa</label>
+                        <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control" placeholder="Mã phiếu, tài sản, đơn vị..." />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Tài sản</label>
+                        <select name="taiSanId" asp-items="ViewBag.TaiSans" class="form-select">
+                            <option value="">Tất cả tài sản</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Trạng thái</label>
+                        <select name="trangThai" class="form-select">
+                            <option value="">Tất cả trạng thái</option>
+                            @foreach (var item in BaoTriController.TrangThaiLabels)
+                            {
+                                <option value="@item.Key" selected="@(ViewBag.TrangThai == item.Key)">@item.Value</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                        <a asp-area="Admin" asp-controller="BaoTri" asp-action="Index" class="btn btn-outline-secondary">Đặt lại</a>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+                    <span><strong>@Model.Count()</strong> phiếu bảo trì phù hợp</span>
+                    <span>Tổng chi phí bảo trì: <strong>@string.Format("{0:N0} đ", tongChiPhi)</strong></span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Mã phiếu</th>
+                                <th>Tài sản</th>
+                                <th>Ngày bảo trì</th>
+                                <th>Ngày hoàn thành</th>
+                                <th>Đơn vị bảo trì</th>
+                                <th class="text-end">Chi phí</th>
+                                <th>Trạng thái</th>
+                                <th class="text-nowrap">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-5">
+                                        Không tìm thấy phiếu bảo trì nào. Hãy tạo phiếu mới hoặc thay đổi bộ lọc.
+                                    </td>
+                                </tr>
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-area="Admin" asp-controller="BaoTri" asp-action="Details" asp-route-id="@item.BT_ID">
+                                            <strong>@item.BT_MaPhieu</strong>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @if (item.TaiSan != null)
+                                        {
+                                            <div>@item.TaiSan.TS_TenTaiSan</div>
+                                            <small class="text-muted">@item.TaiSan.TS_MaTaiSan</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">TS #@item.TS_ID</span>
+                                        }
+                                    </td>
+                                    <td>@(item.BT_NgayBaoTri?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                    <td>@(item.BT_NgayHoanThanh?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.BT_DonViBaoTri) ? "-" : item.BT_DonViBaoTri)</td>
+                                    <td class="text-end text-nowrap">@string.Format("{0:N0} đ", item.BT_ChiPhi ?? 0)</td>
+                                    <td>
+                                        <span class="badge @BaoTriController.BadgeClass(item.BT_TrangThai)">
+                                            @BaoTriController.StatusLabel(item.BT_TrangThai)
+                                        </span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <a asp-area="Admin" asp-controller="BaoTri" asp-action="Details" asp-route-id="@item.BT_ID" class="btn btn-sm btn-outline-primary">Xem</a>
+                                        <a asp-area="Admin" asp-controller="BaoTri" asp-action="Edit" asp-route-id="@item.BT_ID" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                                        <form asp-area="Admin" asp-controller="BaoTri" asp-action="Delete" asp-route-id="@item.BT_ID" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa phiếu bảo trì này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

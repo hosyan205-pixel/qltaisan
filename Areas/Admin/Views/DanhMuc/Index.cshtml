@@ -1,0 +1,115 @@
+@model IEnumerable<DoAn.Models.tblDanhMucTaiSan>
+
+@{
+    ViewData["Title"] = "Quản lý danh mục tài sản";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý danh mục tài sản</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Danh mục tài sản</li>
+            </ol>
+        </nav>
+    </div>
+
+    @if (TempData["Success"] is string message)
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    @if (TempData["Error"] is string errorMsg)
+    {
+        <div class="alert alert-danger" role="alert">@errorMsg</div>
+    }
+
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h2 class="card-title mb-0">Danh sách danh mục tài sản</h2>
+                    <a asp-area="Admin" asp-controller="DanhMuc" asp-action="Create" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Thêm danh mục
+                    </a>
+                </div>
+
+                <form method="get" asp-area="Admin" asp-controller="DanhMuc" asp-action="Index" class="row g-3 mb-4">
+                    <div class="col-md-5">
+                        <label class="form-label">Mã hoặc tên danh mục</label>
+                        <input type="text" name="keyword" value="@ViewBag.Keyword" class="form-control" placeholder="Nhập từ khóa..." />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select name="trangThai" class="form-select">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="true" selected="@(ViewBag.TrangThai is bool b1 && b1)">Hoạt động</option>
+                            <option value="false" selected="@(ViewBag.TrangThai is bool b2 && !b2)">Ngừng hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end gap-2">
+                        <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                        <a asp-area="Admin" asp-controller="DanhMuc" asp-action="Index" class="btn btn-outline-secondary">Đặt lại</a>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+                    <span><strong>@Model.Count()</strong> danh mục phù hợp</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Mã danh mục</th>
+                                <th>Tên danh mục</th>
+                                <th>Mô tả</th>
+                                <th>Ngày tạo</th>
+                                <th>Trạng thái</th>
+                                <th class="text-nowrap">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-5">
+                                        Không tìm thấy danh mục. Hãy thêm danh mục hoặc thay đổi bộ lọc.
+                                    </td>
+                                </tr>
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.DMTS_ID</td>
+                                    <td><strong>@item.DMTS_MaDanhMuc</strong></td>
+                                    <td>@item.DMTS_TenDanhMuc</td>
+                                    <td>@item.DMTS_MoTa</td>
+                                    <td>@item.DMTS_NgayTao.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        @if (item.DMTS_TrangThai == true)
+                                        {
+                                            <span class="badge bg-success">Hoạt động</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">Ngừng hoạt động</span>
+                                        }
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <a asp-area="Admin" asp-controller="DanhMuc" asp-action="Edit" asp-route-id="@item.DMTS_ID" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                                        <form asp-area="Admin" asp-controller="DanhMuc" asp-action="Delete" asp-route-id="@item.DMTS_ID" method="post" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa danh mục này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Xóa</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>

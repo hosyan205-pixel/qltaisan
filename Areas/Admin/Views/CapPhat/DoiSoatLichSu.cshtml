@@ -1,0 +1,18 @@
+@model GiaoNhanReconcileForm
+@{ ViewData["Title"]="Đối soát lịch sử có bằng chứng"; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>@ViewData["Title"]</h1></div><partial name="_Common" />
+    <div class="card"><div class="card-body"><h2 class="card-title">@Model.Code</h2>
+        <div class="alert alert-warning">Chỉ quản trị viên đã xác minh thực tế được ghi nhận. Hệ thống không đề xuất tài khoản theo tên, không điền giả thời điểm bàn giao và không tự sửa trạng thái tài sản.</div>
+        <p>Tên nguyên bản: <strong>@Model.RecordedReceiver</strong> · Ngày nguyên bản: <strong>@Model.RecordedDate?.ToString("dd/MM/yyyy")</strong>. Các giá trị này được giữ nguyên sau đối soát.</p>
+        <form asp-action="ReconcileLegacy" asp-route-id="@Model.Id" method="post" data-confirm="Tôi đã kiểm tra căn cứ và xác minh danh tính, hiện vật, thời điểm bàn giao. Ghi nhận đối soát này có lưu audit và không thay nội dung phiếu cũ.">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div><input asp-for="RequestKey" type="hidden" />
+            <div class="mb-3"><label asp-for="NguoiNhanId" class="form-label">Tài khoản chịu trách nhiệm đã xác minh</label><select asp-for="NguoiNhanId" asp-items="Model.People" class="form-select"><option value="">Chọn sau khi xác minh danh tính</option></select></div>
+            <div class="mb-3"><label asp-for="BanGiaoThucTeVietNam" class="form-label">Thời điểm bàn giao thực tế có căn cứ (giờ Việt Nam)</label><input asp-for="BanGiaoThucTeVietNam" type="datetime-local" class="form-control" required /><small>Phải cùng ngày ghi trên phiếu. Nếu không có căn cứ về thời điểm, giữ trạng thái cần đối soát.</small></div>
+            <div class="mb-3"><label asp-for="CanCu" class="form-label">Biên bản / căn cứ xác minh</label><textarea asp-for="CanCu" class="form-control" maxlength="2000" rows="3" required></textarea></div>
+            <div class="form-check mb-3"><input asp-for="DaXacMinhDanhTinhVaHienVat" class="form-check-input" /><label asp-for="DaXacMinhDanhTinhVaHienVat" class="form-check-label">Tôi đã xác minh danh tính, hiện vật và chứng cứ thời điểm bàn giao.</label></div>
+            <button class="btn btn-warning">Ghi nhận đối soát</button><a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Giữ nguyên và quay lại</a>
+        </form>
+    </div></div>
+</main>
+

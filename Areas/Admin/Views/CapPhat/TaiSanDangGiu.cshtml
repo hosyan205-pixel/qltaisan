@@ -1,0 +1,38 @@
+@model GiaoNhanRows
+@{ ViewData["Title"] = Model.Reconciliation ? "Đối soát giao nhận" : "Tài sản đang giữ"; var manage=ViewData["CanManage"] is not false; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>@ViewData["Title"]</h1></div>
+    <partial name="_Common" />
+    @if(!Model.Reconciliation)
+    {
+        <form method="get" asp-action="ActiveAssignments" class="card card-body mb-3"><div class="row g-3">
+            <div class="col-md-4"><label asp-for="NguoiNhanId" class="form-label">Người chịu trách nhiệm</label><select asp-for="NguoiNhanId" asp-items="Model.People" class="form-select"><option value="">Tất cả</option></select></div>
+            <div class="col-md-4"><label asp-for="PhongBanId" class="form-label">Phòng ban</label><select asp-for="PhongBanId" asp-items="Model.Departments" class="form-select"><option value="">Tất cả</option></select></div>
+            <div class="col-md-4"><div class="form-check mt-4"><input asp-for="QuaHan" class="form-check-input" /><label asp-for="QuaHan" class="form-check-label">Chỉ tài sản quá hạn trả</label></div></div>
+            <div class="col-12"><button class="btn btn-primary">Lọc</button><a asp-action="ActiveAssignments" class="btn btn-outline-secondary">Đặt lại</a></div>
+        </div></form>
+    }
+    else { <p class="alert alert-info">Đối soát thủ công cần chứng từ và xác minh danh tính. Phiếu cũ và trạng thái vật lý được giữ nguyên; không tự động coi tài sản là đã trả.</p> }
+    <div class="card"><div class="card-body">
+        <h2 class="card-title">@Model.Total dòng phù hợp</h2>
+        <div class="table-responsive"><table class="table align-middle">
+            <thead><tr><th>Tài sản</th><th>Phiếu gốc</th><th>Người giữ / phòng ban</th><th>Trách nhiệm</th><th>Trạng thái tài sản</th><th>Hạn trả</th><th>Thao tác</th></tr></thead><tbody>
+            @if(Model.Items.Count==0){<tr><td colspan="7">Không có bản ghi phù hợp.</td></tr>}
+            @foreach(var line in Model.Items)
+            {
+                <tr><td>@line.MaTaiSan<br />@line.TenTaiSan</td><td><a asp-action="Details" asp-route-id="@line.PhieuId">@line.MaPhieu</a> / dòng @line.Id</td>
+                <td>@(line.NguoiChiuTrachNhiem??line.NguoiNhan)<br />@line.PhongBan</td>
+                <td>@GiaoNhanUi.State(line.TrangThaiDong)<br /><small>Bắt đầu: @(line.BatDauUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm")??"Chưa xác minh")</small>
+                @if(line.SoNgaySuDung.HasValue){<div>@line.SoNgaySuDung ngày sử dụng</div>}
+                @if(line.DaDoiSoat){<span class="badge bg-info text-dark">Đã đối soát thủ công</span>}</td>
+                <td>@GiaoNhanUi.AssetState(line.TrangThaiTaiSan)<br />@GiaoNhanUi.Condition(line.TinhTrangTaiSan)</td><td>@(line.NgayTraDuKien?.ToString("dd/MM/yyyy")??"Không có hạn trả")
+                @if(line.SoNgayQuaHan>0){<div class="badge bg-danger">Quá hạn @line.SoNgayQuaHan ngày</div>}</td>
+                <td><a asp-action="History" asp-route-id="@line.TaiSanId" class="btn btn-sm btn-outline-secondary">Lịch sử</a>
+                @if(manage && line.CanDoiSoat){<a asp-action="ReconcileLegacy" asp-route-id="@line.PhieuId" class="btn btn-sm btn-outline-warning">Đối soát</a>}
+                @if(manage && line.TrangThaiDong==GiaoNhanStates.Active){<a asp-action="CreateReturn" asp-route-id="@line.PhieuId" class="btn btn-sm btn-outline-primary">Thu hồi</a><a asp-action="CreateTransfer" asp-route-id="@line.PhieuId" class="btn btn-sm btn-outline-primary">Chuyển giao</a><a asp-action="Incident" asp-route-id="@line.Id" class="btn btn-sm btn-outline-danger">Sự việc</a>}
+                </td></tr>
+            }
+            </tbody></table></div><partial name="_Pagination" model="Model" />
+    </div></div>
+</main>
+

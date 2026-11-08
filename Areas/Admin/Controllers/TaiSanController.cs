@@ -65,6 +65,7 @@ public class TaiSanController(DataContext context, ILogger<TaiSanController> log
         if (ModelState.IsValid)
         {
             var asset = AssetProfile.Create(model);
+            asset.TS_Serial=model.Serial?.Trim();asset.TS_ViTri=model.ViTri?.Trim();
             context.tblTaiSan.Add(asset);
             if (await Save(model.Ma))
             {
@@ -85,7 +86,8 @@ public class TaiSanController(DataContext context, ILogger<TaiSanController> log
         {
             Ten = asset.TS_TenTaiSan, DanhMucId = asset.DMTS_ID, NgayMua = asset.TS_NgayMua,
             NguyenGia = asset.TS_NguyenGia, HanBaoHanh = asset.TS_HanBaoHanh,
-            TinhTrang = AssetConditions.Normalize(asset.TS_TinhTrang), MoTa = asset.TS_MoTa, GhiChu = asset.TS_GhiChu
+            TinhTrang = AssetConditions.Normalize(asset.TS_TinhTrang), MoTa = asset.TS_MoTa, GhiChu = asset.TS_GhiChu,
+            Serial=asset.TS_Serial,ViTri=asset.TS_ViTri
         };
         await PrepareEdit(model, asset);
         return View(model);
@@ -97,9 +99,12 @@ public class TaiSanController(DataContext context, ILogger<TaiSanController> log
         var asset = await context.tblTaiSan.FindAsync(id);
         if (asset == null) return NotFound();
         await ValidateFields(model);
+        if((asset.TS_TinhTrang=="MatDangXuLy"||asset.TS_TrangThai is "ChoKiemTra" or "ChoBaoTri" or "ChoXuLy")&&model.TinhTrang!=asset.TS_TinhTrang)
+            ModelState.AddModelError(nameof(model.TinhTrang),"Tình trạng này phải được ghi nhận qua kiểm tra/tìm thấy trong module giao nhận.");
         if (ModelState.IsValid)
         {
             AssetProfile.Update(model, asset);
+            asset.TS_Serial=model.Serial?.Trim();asset.TS_ViTri=model.ViTri?.Trim();
             if (await Save())
             {
                 TempData["Success"] = "Cập nhật tài sản thành công.";

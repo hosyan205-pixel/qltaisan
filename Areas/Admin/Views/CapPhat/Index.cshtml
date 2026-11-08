@@ -1,0 +1,73 @@
+@model CapPhatIndex
+@{ ViewData["Title"] = "Giao / thu hồi tài sản"; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>Giao / thu hồi tài sản</h1></div>
+    <partial name="_Common" />
+    <section class="section"><div class="card"><div class="card-body">
+        <h2 class="card-title">Tra cứu phiếu cấp phát đã lưu</h2>
+        <form method="get" asp-action="Index" class="row g-3 mb-4">
+            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            <div class="col-md-6 col-xl-4">
+                <label asp-for="Keyword" class="form-label">Mã phiếu, mã hoặc tên tài sản</label>
+                <input asp-for="Keyword" class="form-control" maxlength="150" />
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <label asp-for="NguoiNhan" class="form-label">Tên người nhận ghi trên phiếu</label>
+                <input asp-for="NguoiNhan" class="form-control" maxlength="100" />
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <label asp-for="PhongBanId" class="form-label">Phòng ban</label>
+                <select asp-for="PhongBanId" asp-items="Model.PhongBans" class="form-select"><option value="">Tất cả phòng ban</option></select>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <label asp-for="TrangThai" class="form-label">Trạng thái ghi trên phiếu</label>
+                <select asp-for="TrangThai" class="form-select"><option value="">Tất cả trạng thái</option>
+                    @foreach (var status in Model.TrangThais) { <option value="@status">@GiaoNhanUi.State(status)</option> }
+                </select>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <label asp-for="ThuHoi" class="form-label">Dữ liệu thu hồi</label>
+                <select asp-for="ThuHoi" class="form-select">
+                    <option value="">Tất cả</option><option value="none">Chưa ghi nhận thu hồi</option>
+                    <option value="partial">Đã ghi nhận thu hồi một phần</option><option value="all">Đã ghi nhận thu hồi toàn bộ</option>
+                </select>
+            </div>
+            <div class="col-md-6 col-xl-3"><label asp-for="TuNgay" class="form-label">Ngày cấp phát từ</label><input asp-for="TuNgay" type="date" class="form-control" /></div>
+            <div class="col-md-6 col-xl-3"><label asp-for="DenNgay" class="form-label">Đến ngày</label><input asp-for="DenNgay" type="date" class="form-control" /></div>
+            <div class="col-md-6">
+                <label asp-for="Sort" class="form-label">Sắp xếp</label>
+                <select asp-for="Sort" class="form-select"><option value="date_desc">Ngày cấp phát mới trước</option><option value="date_asc">Ngày cấp phát cũ trước</option><option value="code_asc">Mã phiếu tăng dần</option><option value="code_desc">Mã phiếu giảm dần</option></select>
+            </div>
+            <div class="col-md-3"><label asp-for="PageSize" class="form-label">Số phiếu mỗi trang</label><select asp-for="PageSize" class="form-select"><option>10</option><option>20</option><option>50</option></select></div>
+            <div class="col-md-3 d-flex align-items-end"><div class="form-check"><input asp-for="PhongBanNgungHoatDong" class="form-check-input" /><label asp-for="PhongBanNgungHoatDong" class="form-check-label">Phòng ban ngừng hoạt động</label></div></div>
+            <div class="col-12 d-flex gap-2"><button type="submit" class="btn btn-primary">Tìm kiếm</button><a asp-action="Index" class="btn btn-outline-secondary">Xóa bộ lọc</a></div>
+            <div class="col-md-4"><label asp-for="LoaiPhieu" class="form-label">Loại phiếu</label><select asp-for="LoaiPhieu" class="form-select"><option value="">Tất cả</option><option value="Giao">Giao tài sản</option><option value="ThuHoi">Thu hồi</option><option value="Chuyen">Chuyển giao</option><option value="Cu">Lịch sử cũ</option></select></div>
+            @if(ViewData["CanManage"] is not false)
+            {
+                <div class="col-md-4 form-check"><input asp-for="CanDoiSoat" class="form-check-input" /><label asp-for="CanDoiSoat" class="form-check-label">Có dòng cần đối soát</label></div>
+                <div class="col-md-4 form-check"><input asp-for="NguoiNhanNgungHoatDong" class="form-check-input" /><label asp-for="NguoiNhanNgungHoatDong" class="form-check-label">Người nhận bị khóa</label></div>
+            }
+        </form>
+        <p><strong>@Model.Total</strong> phiếu phù hợp. Số đã thu hồi được đếm từ từng dòng có ngày thu hồi.</p>
+        <div class="table-responsive"><table class="table table-hover align-middle">
+            <thead><tr><th>Mã phiếu</th><th>Ngày cấp phát</th><th>Người giao</th><th>Người nhận ghi trên phiếu</th><th>Phòng ban</th><th>Tài sản / đã ghi nhận trả</th><th>Trạng thái phiếu</th><th>Tổng hợp thu hồi</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                @if (Model.Items.Count == 0) { <tr><td colspan="9" class="text-center text-muted py-4">Không tìm thấy phiếu phù hợp.</td></tr> }
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-action="Details" asp-route-id="@item.Id">@item.MaPhieu</a><br /><small>@GiaoNhanUi.Kind(item.LoaiPhieu)</small></td>
+                        <td class="text-nowrap">@(item.NgayCapPhat?.ToString("dd/MM/yyyy") ?? "Chưa có")</td>
+                        <td>@(item.NguoiGiao ?? "Chưa có")</td><td>@(item.NguoiNhan ?? "Chưa có")</td>
+                        <td>@item.PhongBan @if (item.PhongBanHoatDong != true) { <span class="badge bg-secondary">Ngừng hoạt động / chưa rõ</span> }</td>
+                        <td>@item.SoTaiSan / @item.SoDaThuHoi<br /><small>Chuyển: @item.SoDaChuyen · Đang giữ: @item.SoDangGiu</small></td><td>@GiaoNhanUi.State(item.TrangThai)
+                            @if (item.CanDoiSoat) { <span class="badge bg-warning text-dark">Cần đối soát</span> }
+                        </td><td>@item.ThuHoiLabel</td>
+                        <td><a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Xem</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table></div>
+        <partial name="_Pagination" model="Model" />
+    </div></div></section>
+</main>

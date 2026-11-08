@@ -28,7 +28,7 @@ namespace DoAn.Controllers
 
             var taiKhoan = await _context.tblTaiKhoan.FirstOrDefaultAsync(t => t.TK_TenDangNhap == model.TenDangNhap);
 
-            if (taiKhoan == null || taiKhoan.TK_MatKhau != model.MatKhau)
+            if (taiKhoan == null || !PasswordMatches(model.MatKhau,taiKhoan.TK_MatKhau))
             {
                 ModelState.AddModelError(string.Empty, "Tên đăng nhập hoặc mật khẩu không đúng.");
 
@@ -79,6 +79,15 @@ namespace DoAn.Controllers
         {
             HttpContext.Session.Clear();
             return Redirect("/DangNhap/Index");
+        }
+
+        private static bool PasswordMatches(string supplied,string stored)
+        {
+            if(stored.Length==60&&(stored.StartsWith("$2a$")||stored.StartsWith("$2b$")||stored.StartsWith("$2y$")))
+            {
+                try{return BCrypt.Net.BCrypt.Verify(supplied,stored);}catch{return false;}
+            }
+            return System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(System.Text.Encoding.UTF8.GetBytes(supplied),System.Text.Encoding.UTF8.GetBytes(stored));
         }
     }
 }

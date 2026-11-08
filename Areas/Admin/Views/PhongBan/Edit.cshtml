@@ -1,0 +1,79 @@
+@model DoAn.Models.tblPhongBan
+
+@{
+    ViewData["Title"] = "Cập nhật phòng ban";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Cập nhật phòng ban</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="PhongBan" asp-action="Index">Quản lý
+                    phòng ban</a></li>
+                    <li class="breadcrumb-item active">@Model.PB_MaPhongBan</li>
+                </ol>
+            </nav>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title">Thông tin phòng ban</h2>
+                <form asp-area="Admin" asp-controller="PhongBan" asp-action="Edit" asp-route-id="@Model.PB_ID" method="post"
+                      class="row g-3">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+
+                    <input type="hidden" asp-for="PB_ID" />
+                    <input type="hidden" asp-for="PB_NgayTao" />
+
+                    <div class="col-md-6">
+                        <label asp-for="PB_MaPhongBan" class="form-label">Mã phòng ban</label>
+                        <input asp-for="PB_MaPhongBan" class="form-control" maxlength="30" required />
+                        <span asp-validation-for="PB_MaPhongBan" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PB_TenPhongBan" class="form-label">Tên phòng ban</label>
+                        <input asp-for="PB_TenPhongBan" class="form-control" maxlength="150" required />
+                        <span asp-validation-for="PB_TenPhongBan" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PB_NguoiPhuTrach" class="form-label">Người phụ trách</label>
+                        <input asp-for="PB_NguoiPhuTrach" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PB_SoDienThoai" class="form-label">Số điện thoại</label>
+                        <input asp-for="PB_SoDienThoai" class="form-control" />
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="PB_TrangThai" class="form-label">Trạng thái</label>
+                        <select asp-for="PB_TrangThai" class="form-select">
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Ngừng hoạt động</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Ngày tạo</label>
+                        <input type="text" class="form-control" value="@Model.PB_NgayTao.ToString("dd/MM/yyyy HH:mm")"
+                            readonly disabled />
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="PB_DiaChi" class="form-label">Địa chỉ / Vị trí phòng</label>
+                        <textarea asp-for="PB_DiaChi" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        <a asp-area="Admin" asp-controller="PhongBan" asp-action="Index"
+                           class="btn btn-outline-secondary">Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>

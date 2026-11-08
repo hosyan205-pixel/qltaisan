@@ -25,6 +25,8 @@
                     <input type="hidden" asp-for="TK_ID" />
 
                     <div class="row g-3">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div class="col-md-6"><label asp-for="PB_ID" class="form-label fw-bold">Phòng ban làm việc</label><select asp-for="PB_ID" asp-items="ViewBag.Departments" class="form-select"><option value="">Chưa xác minh phòng ban</option></select><span asp-validation-for="PB_ID" class="text-danger"></span><small>Đổi phòng ban tài khoản không tự chuyển tài sản hoặc sửa các phiếu lịch sử. Cần lập phiếu chuyển giao khi trách nhiệm thay đổi.</small></div>
 
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Tên đăng nhập</label>

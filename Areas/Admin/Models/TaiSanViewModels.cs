@@ -9,6 +9,8 @@ namespace DoAn.Areas.Admin.Models;
 
 public class AssetFieldsViewModel : IValidatableObject
 {
+    [Display(Name="Serial"),StringLength(100)] public string? Serial { get; set; }
+    [Display(Name="Vị trí"),StringLength(150)] public string? ViTri { get; set; }
     [Display(Name = "Tên tài sản"), Required(ErrorMessage = "Vui lòng nhập tên tài sản."), StringLength(150, ErrorMessage = "Tên tài sản tối đa 150 ký tự.")]
     public string Ten { get; set; } = "";
     [Display(Name = "Danh mục"), Range(1, int.MaxValue, ErrorMessage = "Vui lòng chọn danh mục.")]
@@ -37,7 +39,7 @@ public class AssetFieldsViewModel : IValidatableObject
             yield return new ValidationResult("Ngày mua phải từ năm 1900 trở đi.", new[] { nameof(NgayMua) });
         if (NgayMua.HasValue && HanBaoHanh.HasValue && HanBaoHanh < NgayMua)
             yield return new ValidationResult("Hạn bảo hành không được trước ngày mua.", new[] { nameof(HanBaoHanh) });
-        if (!AssetConditions.Labels.ContainsKey(TinhTrang ?? ""))
+        if (!AssetConditions.Labels.ContainsKey(TinhTrang ?? "") && TinhTrang is not ("CanKiemTra" or "ThieuPhuKien" or "MatDangXuLy"))
             yield return new ValidationResult("Tình trạng không hợp lệ.", new[] { nameof(TinhTrang) });
         if (NguyenGia.HasValue && decimal.Round(NguyenGia.Value, 2) != NguyenGia)
             yield return new ValidationResult("Nguyên giá chỉ được có tối đa 2 chữ số thập phân.", new[] { nameof(NguyenGia) });

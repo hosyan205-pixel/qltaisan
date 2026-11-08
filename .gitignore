@@ -22,3 +22,6 @@ obj/
 # OS
 Thumbs.db
 .DS_Store
+
+# Local database backups and audit output
+.local-backups/

@@ -1,6 +1,7 @@
 @model IEnumerable<DoAn.Models.tblMenu>
 
 <nav>
+    @if(Context.Session.GetInt32("TaiKhoanID").HasValue){<a class="nav-item" asp-area="Admin" asp-controller="CapPhat" asp-action="ActiveAssignments">Tài sản của tôi</a>}
     @foreach (var item in Model.Where(m => m.Levels == 1).OrderBy(m => m.MenuOrder))
     {
         <a class="nav-item" href="@item.Link">@item.MenuName</a>

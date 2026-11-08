@@ -1,0 +1,36 @@
+@model GiaoNhanConfirmation
+@{
+    ViewData["Title"] = "Xác nhận — " + GiaoNhanUi.Kind(Model.Kind);
+    var action = Model.Kind == "ThuHoi" ? "ConfirmReturn" : Model.Kind == "Chuyen" ? "ConfirmTransfer" : "ConfirmHandover";
+}
+<main id="main" class="main">
+    <div class="pagetitle"><h1>@ViewData["Title"]</h1></div>
+    <partial name="_Common" />
+    <div class="card"><div class="card-body">
+        <h2 class="card-title">Phiếu @Model.Code</h2>
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div asp-validation-summary="All" class="alert alert-danger" role="alert"></div>
+        }
+        <p>Trạng thái: <strong>@GiaoNhanUi.State(Model.State)</strong> · Người nhận: @Model.Receiver · Phòng ban: @Model.Department</p>
+        <p>Mục đích / lý do: @Model.Purpose</p>
+        <div class="alert alert-warning">Chỉ xác nhận khi đã kiểm tra việc giao nhận thực tế. Hệ thống ghi nhận quản trị viên thực hiện; thao tác này không thay chữ ký của người nhận.</div>
+        <div class="table-responsive"><table class="table"><thead><tr><th>Tài sản</th><th>Dòng nguồn</th><th>Tình trạng giao</th><th>Tình trạng nhận</th><th>Trạng thái dòng</th></tr></thead><tbody>
+        @foreach (var line in Model.Lines) { <tr><td>@line.MaTaiSan · @line.TenTaiSan</td><td>@line.DongNguonId</td><td>@GiaoNhanUi.Condition(line.TinhTrangKhiGiao)</td><td>@GiaoNhanUi.Condition(line.TinhTrangKhiThuHoi)</td><td>@GiaoNhanUi.State(line.TrangThaiDong)</td></tr> }
+        </tbody></table></div>
+        @if (Model.State == GiaoNhanStates.Waiting)
+        {
+            <form asp-action="@action" asp-route-id="@Model.Id" method="post" asp-antiforgery="false" data-confirm="Xác nhận đã thực hiện giao nhận các tài sản trong phiếu? Hệ thống sẽ cập nhật trách nhiệm và lưu lịch sử.">
+                @Html.AntiForgeryToken()<input name="PhienBan" value="@Model.PhienBan" type="hidden" />
+                @if (Model.Kind == "ThuHoi")
+                {
+                    <div class="mb-3"><label for="actual-return" class="form-label">Thời điểm nhận lại tại Việt Nam (để trống để dùng hiện tại)</label><input type="datetime-local" name="ThucHienVietNam" id="actual-return" value="@Model.ThucHienVietNam?.ToString("yyyy-MM-ddTHH:mm")" class="form-control" /></div>
+                }
+                <button type="submit" class="btn btn-success">Xác nhận thực tế</button>
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Kiểm tra lại phiếu</a>
+            </form>
+        }
+        else { <p>Phiếu không còn chờ xác nhận. <a asp-action="Details" asp-route-id="@Model.Id">Xem hiện trạng</a>.</p> }
+    </div></div>
+</main>
+

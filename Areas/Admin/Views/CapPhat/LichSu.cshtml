@@ -1,0 +1,31 @@
+@model CapPhatHistory
+@{ ViewData["Title"] = "Lịch sử cấp phát " + Model.MaTaiSan; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>Lịch sử cấp phát: @Model.MaTaiSan</h1></div>
+    <partial name="_Common" />
+    <div class="card"><div class="card-body">
+        <h2 class="card-title">@Model.TenTaiSan</h2>
+        <p>Phiếu mới lưu bản chụp thông tin khi xác nhận. Dữ liệu cũ chưa có bản chụp dùng tên hiện tại và được đánh dấu cần đối soát. Thời gian hiển thị theo giờ Việt Nam.</p>
+        <div class="table-responsive"><table class="table table-hover align-middle">
+            <thead><tr><th>Phiếu gốc / dòng</th><th>Ngày cấp phát</th><th>Người nhận ghi trên phiếu</th><th>Phòng ban</th><th>Tình trạng khi giao</th><th>Ngày thu hồi đã lưu</th><th>Tình trạng khi nhận</th><th>Ghi chú</th></tr></thead>
+            <tbody>
+                @if (Model.Items.Count == 0) { <tr><td colspan="8" class="text-center py-4">Chưa có lịch sử cấp phát.</td></tr> }
+                @foreach (var line in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-action="Details" asp-route-id="@line.PhieuId">@line.MaPhieu</a> / @line.Id
+                            <div>@GiaoNhanUi.Kind(line.LoaiPhieu) / @GiaoNhanUi.State(line.TrangThaiDong)</div>
+                            @if(line.DongNguonId.HasValue){<small>Nối từ dòng @line.DongNguonId</small>}
+                            @if(line.DaDoiSoat){<small>Đã đối soát thủ công</small>}
+                        </td>
+                        <td>@(line.NgayCapPhat?.ToString("dd/MM/yyyy") ?? "Chưa có")<br /><small>Bắt đầu: @(line.BatDauUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm")??"Chưa xác minh")<br />Kết thúc: @(line.KetThucUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm")??"Chưa ghi nhận")</small></td><td>@line.NguoiNhan</td><td>@line.PhongBan</td>
+                        <td>@GiaoNhanUi.Condition(line.TinhTrangKhiGiao)</td><td>@(line.NgayThuHoi?.ToString("dd/MM/yyyy") ?? "Chưa ghi nhận")</td>
+                        <td>@GiaoNhanUi.Condition(line.TinhTrangKhiThuHoi)</td><td class="text-break">@line.GhiChu</td>
+                    </tr>
+                }
+            </tbody>
+        </table></div>
+        <partial name="_Pagination" model="Model" />
+        @if(ViewData["CanManage"] is not false){<a asp-controller="TaiSan" asp-action="Details" asp-route-id="@Model.TaiSanId" class="btn btn-outline-secondary mt-3">Hồ sơ tài sản</a>}
+    </div></div>
+</main>

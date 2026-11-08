@@ -25,6 +25,8 @@ namespace DoAn.Models
         public virtual DbSet<tblMenu> tblMenu { get; set; } = null!;
         public virtual DbSet<AdminMenu> AdminMenu { get; set; } = null!;
 
+        public DbSet<tblSuKienCapPhat> tblSuKienCapPhat => Set<tblSuKienCapPhat>();
+
         // Aliases for compatibility
         public DbSet<tblTaiKhoan> tblTaiKhoans => tblTaiKhoan;
         public DbSet<tblTaiKhoan> TaiKhoans => tblTaiKhoan;
@@ -252,6 +254,8 @@ namespace DoAn.Models
                 entity.HasKey(e => e.AdminMenuID).HasName("PRIMARY");
             });
 
+            ConfigureSprint2(modelBuilder);
+
             // Restrict cascade delete on assets and categories
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
@@ -264,6 +268,80 @@ namespace DoAn.Models
                     }
                 }
             }
+        }
+
+        private static void ConfigureSprint2(ModelBuilder builder)
+        {
+            builder.Entity<tblTaiKhoan>(e =>
+            {
+                e.HasIndex(x => x.PB_ID).HasDatabaseName("IX_TK_PB");
+                e.HasOne(x => x.PhongBanLamViec).WithMany().HasForeignKey(x => x.PB_ID)
+                    .OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_TK_PB");
+            });
+            builder.Entity<tblTaiSan>().Property(x => x.TS_DangQuanLy).HasDefaultValue(true);
+            builder.Entity<tblTaiSan>().Property(x => x.TS_TinhTrang).IsConcurrencyToken();
+            builder.Entity<tblCapPhatTaiSan>(e =>
+            {
+                e.Property(x => x.CP_NguoiNhan).IsRequired();
+                e.Property(x => x.CP_RequestKey).HasConversion<Guid>().HasColumnType("char(36)").HasCharSet("ascii").UseCollation("ascii_bin");
+                e.Property(x => x.CP_PhienBan).IsConcurrencyToken().HasDefaultValue(0L);
+                foreach (var p in new[] { nameof(DoAn.Models.tblCapPhatTaiSan.CP_NgayLapUTC), nameof(DoAn.Models.tblCapPhatTaiSan.CP_ThucHienUTC), nameof(DoAn.Models.tblCapPhatTaiSan.CP_XacNhanUTC) })
+                    e.Property(p).HasColumnType("datetime(6)");
+                e.HasIndex(x => x.CP_RequestKey).IsUnique().HasDatabaseName("UX_CP_RequestKey");
+                e.HasIndex(x => x.CP_NguoiNhanID).HasDatabaseName("IX_CP_NguoiNhan");
+                e.HasIndex(x => x.CP_NguoiLapID).HasDatabaseName("IX_CP_NguoiLap");
+                e.HasIndex(x => x.CP_NguoiXacNhanID).HasDatabaseName("IX_CP_NguoiXacNhan");
+                e.HasIndex(x => new { x.CP_LoaiPhieu, x.CP_TrangThai, x.CP_NgayLapUTC, x.CP_ID }).HasDatabaseName("IX_CP_Loai_TrangThai_Ngay");
+                e.HasOne(x => x.NguoiNhan).WithMany().HasForeignKey(x => x.CP_NguoiNhanID).OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_CP_NguoiNhan");
+                e.HasOne(x => x.NguoiLap).WithMany().HasForeignKey(x => x.CP_NguoiLapID).OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_CP_NguoiLap");
+                e.HasOne(x => x.NguoiXacNhan).WithMany().HasForeignKey(x => x.CP_NguoiXacNhanID).OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_CP_NguoiXacNhan");
+                e.ToTable("tblcapphattaisan", t =>
+                {
+                    t.HasCheckConstraint("CK_CP_Loai", "CP_LoaiPhieu IS NULL OR CP_LoaiPhieu IN ('Giao','ThuHoi','Chuyen')");
+                    t.HasCheckConstraint("CK_CP_HanTra", "CP_NgayTraDuKien IS NULL OR CP_NgayDuKien IS NULL OR CP_NgayTraDuKien>=CP_NgayDuKien");
+                });
+            });
+            builder.Entity<tblChiTietCapPhat>(e =>
+            {
+                foreach (var p in new[] { nameof(DoAn.Models.tblChiTietCapPhat.CTCP_BatDauUTC), nameof(DoAn.Models.tblChiTietCapPhat.CTCP_KetThucUTC), nameof(DoAn.Models.tblChiTietCapPhat.CTCP_KiemTraUTC), nameof(DoAn.Models.tblChiTietCapPhat.CTCP_DoiSoatUTC) })
+                    e.Property(p).HasColumnType("datetime(6)");
+                e.Property(x => x.CTCP_TaiSanHieuLucID)
+                    .HasComputedColumnSql("CASE WHEN CTCP_TrangThai='DangHieuLuc' THEN TS_ID ELSE NULL END", stored: true);
+                e.HasIndex(x => x.CTCP_TaiSanHieuLucID).IsUnique().HasDatabaseName("UX_CTCP_TaiSanHieuLuc");
+                e.HasIndex(x => new { x.TS_ID, x.CTCP_TrangThai }).HasDatabaseName("IX_CTCP_TS_TrangThai");
+                e.HasIndex(x => new { x.CP_ID, x.CTCP_TrangThai }).HasDatabaseName("IX_CTCP_CP_TrangThai");
+                e.HasIndex(x => x.CTCP_DongNguonID).HasDatabaseName("IX_CTCP_DongNguon");
+                e.HasIndex(x => x.CTCP_NguoiKiemTraID).HasDatabaseName("IX_CTCP_NguoiKiemTra");
+                e.HasIndex(x => x.CTCP_NguoiDoiSoatID).HasDatabaseName("IX_CTCP_NguoiDoiSoat");
+                e.HasOne(x => x.DongNguon).WithMany(x => x.CacDongKeTiep).HasForeignKey(x => x.CTCP_DongNguonID)
+                    .OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_CTCP_DongNguon");
+                e.HasOne(x => x.NguoiKiemTra).WithMany().HasForeignKey(x => x.CTCP_NguoiKiemTraID)
+                    .OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_CTCP_NguoiKiemTra");
+                e.HasOne(x => x.NguoiDoiSoat).WithMany().HasForeignKey(x => x.CTCP_NguoiDoiSoatID)
+                    .OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_CTCP_NguoiDoiSoat");
+                e.ToTable("tblchitietcapphat", t =>
+                {
+                    t.HasCheckConstraint("CK_CTCP_TrangThai", "CTCP_TrangThai IS NULL OR CTCP_TrangThai IN ('ChoGiao','ChoNhan','ChoChuyen','DangHieuLuc','DaNhan','DaThuHoi','DaChuyen')");
+                    t.HasCheckConstraint("CK_CTCP_ThoiGian", "CTCP_BatDauUTC IS NULL OR CTCP_KetThucUTC IS NULL OR CTCP_KetThucUTC>=CTCP_BatDauUTC");
+                });
+            });
+            builder.Entity<tblSuKienCapPhat>(e =>
+            {
+                e.ToTable("tblsukiencapphat");
+                e.HasKey(x => x.SK_ID);
+                e.Property(x => x.SK_ID).ValueGeneratedOnAdd();
+                e.Property(x => x.SK_ThoiDiemUTC).HasColumnType("datetime(6)");
+                e.Property(x => x.SK_Truoc).HasColumnType("longtext");
+                e.Property(x => x.SK_Sau).HasColumnType("longtext");
+                e.Property(x => x.SK_RequestKey).HasConversion<Guid>().HasColumnType("char(36)").HasCharSet("ascii").UseCollation("ascii_bin");
+                e.HasIndex(x => x.SK_RequestKey).IsUnique().HasDatabaseName("UX_SK_RequestKey");
+                e.HasIndex(x => new { x.CP_ID, x.SK_ThoiDiemUTC, x.SK_ID }).HasDatabaseName("IX_SK_CP_ThoiDiem");
+                e.HasIndex(x => new { x.CTCP_ID, x.SK_ThoiDiemUTC }).HasDatabaseName("IX_SK_CTCP_ThoiDiem");
+                e.HasIndex(x => x.SK_NguoiThucHienID).HasDatabaseName("IX_SK_NguoiThucHien");
+                e.HasOne(x => x.CapPhat).WithMany(x => x.SuKiens).HasForeignKey(x => x.CP_ID).OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_SK_CP");
+                e.HasOne(x => x.ChiTiet).WithMany(x => x.SuKiens).HasForeignKey(x => x.CTCP_ID).OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_SK_CTCP");
+                e.HasOne(x => x.NguoiThucHien).WithMany().HasForeignKey(x => x.SK_NguoiThucHienID).OnDelete(DeleteBehavior.Restrict).HasConstraintName("FK_SK_NguoiThucHien");
+            });
         }
     }
 }

@@ -8,11 +8,11 @@ var connection = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<DataContext>(options => options.UseMySql(
     connection,
-    new MySqlServerVersion(new Version(8, 0, 0))
+    new MariaDbServerVersion(new Version(10, 4, 32))
 ));
 builder.Services.AddDbContext<DBContext>(options => options.UseMySql(
     connection,
-    new MySqlServerVersion(new Version(8, 0, 0))
+    new MariaDbServerVersion(new Version(10, 4, 32))
 ));
 
 // Add services to the container.
@@ -28,6 +28,20 @@ builder.Services.AddSession(options =>
 });
 
 var app = builder.Build();
+
+// IIS and direct Kestrel runs honor the same temporary maintenance marker.
+app.Use(async (http, next) =>
+{
+    var offline = Path.Combine(app.Environment.ContentRootPath, "app_offline.htm");
+    if (File.Exists(offline))
+    {
+        http.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
+        http.Response.ContentType = "text/html; charset=utf-8";
+        await http.Response.WriteAsync(await File.ReadAllTextAsync(offline));
+        return;
+    }
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

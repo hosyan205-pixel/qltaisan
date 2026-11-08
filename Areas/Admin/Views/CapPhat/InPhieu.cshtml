@@ -1,0 +1,19 @@
+@model CapPhatDetails
+@{ Layout = null; }
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8" /><title>@Model.Phieu.MaPhieu</title>
+<style>body{font:15px Arial,sans-serif;margin:32px;color:#111}table{width:100%;border-collapse:collapse}th,td{border:1px solid #777;padding:8px;text-align:left}.signatures{display:flex;justify-content:space-around;margin:40px 0 100px}.muted{color:#555}@@media print{.tools{display:none}}</style></head>
+<body>
+<div class="tools"><button onclick="window.print()">In phiếu</button><a asp-action="Details" asp-route-id="@Model.Phieu.Id"> Quay lại</a></div>
+<h1>@GiaoNhanUi.Kind(Model.Phieu.LoaiPhieu) — @Model.Phieu.MaPhieu</h1>
+<p>Trạng thái: @GiaoNhanUi.State(Model.Phieu.TrangThai) · Phòng ban: @Model.Phieu.PhongBan</p>
+<p>Người giao: @Model.Phieu.NguoiGiao · Người nhận ghi trên phiếu: @Model.Phieu.NguoiNhan</p>
+<p>Người xác nhận: @Model.Phieu.NguoiXacNhan · Thời điểm: @(Model.Phieu.XacNhanUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm") ?? "Chưa xác nhận") (giờ Việt Nam)</p>
+<p>Hạn trả: @(Model.Phieu.NgayTraDuKien?.ToString("dd/MM/yyyy") ?? "Không có") · Lý do: @Model.Phieu.LyDo</p>
+@if(Model.Phieu.CanDoiSoat){<p><strong>Cần đối soát: dữ liệu lịch sử chưa xác minh trách nhiệm.</strong></p>}
+<table><thead><tr><th>Tài sản</th><th>Trách nhiệm</th><th>Tình trạng giao / nhận</th><th>Ghi chú</th></tr></thead><tbody>
+@foreach(var row in Model.Items){<tr><td>@row.MaTaiSan · @row.TenTaiSan</td><td>@GiaoNhanUi.State(row.TrangThaiDong)</td><td>@GiaoNhanUi.Condition(row.TinhTrangKhiGiao) / @GiaoNhanUi.Condition(row.TinhTrangKhiThuHoi)</td><td>@row.GhiChu</td></tr>}
+</tbody></table>
+<div class="signatures"><div>Người giao<br />(Ký, ghi rõ họ tên)</div><div>Người nhận<br />(Ký, ghi rõ họ tên)</div></div>
+<p class="muted">Các ô chữ ký dành cho bản giấy. Hệ thống không ghi nhận chữ ký từ thao tác in phiếu.</p>
+</body></html>

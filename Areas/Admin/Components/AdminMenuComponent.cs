@@ -17,9 +17,10 @@ namespace DoAn.Areas.Admin.Components
         public async Task<IViewComponentResult> InvokeAsync()
         {
             var menu = await _context.AdminMenus
+                .AsNoTracking()
                 .Where(m => m.IsActive == true)
-                .OrderBy(m => m.ItemLevel)
-                .ThenBy(m => m.ItemOrder)
+                .OrderBy(m => m.ItemOrder)
+                .ThenBy(m => m.AdminMenuID)
                 .ToListAsync();
 
             return View(menu);

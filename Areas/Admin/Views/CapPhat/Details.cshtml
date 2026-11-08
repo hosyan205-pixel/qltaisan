@@ -1,0 +1,97 @@
+@model CapPhatDetails
+@{ ViewData["Title"] = "Chi tiết phiếu " + Model.Phieu.MaPhieu; }
+<main id="main" class="main">
+    <div class="pagetitle"><h1>Phiếu @Model.Phieu.MaPhieu</h1></div>
+    <partial name="_Common" />
+    @{ var doc=Model.Phieu;var manage=ViewData["CanManage"] is not false;var confirm=doc.LoaiPhieu=="ThuHoi"?"ConfirmReturn":doc.LoaiPhieu=="Chuyen"?"ConfirmTransfer":"ConfirmHandover"; }
+
+<div class="card"><div class="card-body">
+    <h2 class="card-title">@GiaoNhanUi.Kind(doc.LoaiPhieu) · @GiaoNhanUi.State(doc.TrangThai)</h2>
+    <p>@doc.SoTaiSan tài sản · @doc.SoDaThuHoi nhận lại · @doc.SoDaChuyen chuyển giao · @doc.SoDangGiu đang chịu trách nhiệm.</p>
+    <p>Dự kiến: @(doc.NgayDuKien?.ToString("dd/MM/yyyy")??"Chưa có") · Hạn trả: @(doc.NgayTraDuKien?.ToString("dd/MM/yyyy")??"Không có")</p>
+    @if(doc.NguoiNhanXacMinh!=null){<p>Người nhận đã xác minh: <strong>@doc.NguoiNhanXacMinh</strong>.</p>}
+    <div class="d-flex flex-wrap gap-2 mb-3">
+        @if(manage&&doc.LoaiPhieu!=null&&doc.TrangThai==GiaoNhanStates.Draft)
+        {
+            <a asp-action="EditDraft" asp-route-id="@doc.Id" class="btn btn-outline-primary">Sửa nháp</a>
+            <form asp-action="Submit" asp-route-id="@doc.Id" method="post" data-confirm="Gửi phiếu sang chờ xác nhận? Tài sản chưa đổi người giữ."><input type="hidden" name="phienBan" value="@doc.PhienBan" /><button class="btn btn-primary">Gửi xác nhận</button></form>
+        }
+        @if(manage&&doc.LoaiPhieu!=null&&doc.TrangThai==GiaoNhanStates.Waiting){<a asp-action="@confirm" asp-route-id="@doc.Id" class="btn btn-success">Kiểm tra và xác nhận thực tế</a>}
+        @if(manage&&doc.SoDangGiu>0)
+        {
+            <a asp-action="CreateReturn" asp-route-id="@doc.Id" class="btn btn-warning">Thu hồi một phần / toàn bộ</a>
+            <a asp-action="CreateTransfer" asp-route-id="@doc.Id" class="btn btn-outline-primary">Chuyển giao tài sản đang giữ</a>
+        }
+        @if(manage&&doc.CanDoiSoat){<a asp-action="ReconcileLegacy" asp-route-id="@doc.Id" class="btn btn-outline-warning">Đối soát có bằng chứng</a>}
+        <a asp-action="Print" asp-route-id="@doc.Id" class="btn btn-outline-secondary">In biên bản</a>
+    </div>
+    @if(manage&&doc.LoaiPhieu!=null&&(doc.TrangThai==GiaoNhanStates.Draft||doc.TrangThai==GiaoNhanStates.Waiting))
+    {
+        <form asp-action="Cancel" asp-route-id="@doc.Id" method="post" class="row g-2" data-confirm="Hủy phiếu chưa xác nhận? Trách nhiệm đang có được giữ nguyên.">
+            <input name="phienBan" type="hidden" value="@doc.PhienBan" /><div class="col-md-8"><label for="cancel-reason" class="form-label">Lý do hủy</label><input id="cancel-reason" name="lyDo" class="form-control" maxlength="2000" required /></div><div class="col-md-4 d-flex align-items-end"><button class="btn btn-outline-danger">Hủy phiếu</button></div>
+        </form>
+    }
+</div></div>
+    <div class="card"><div class="card-body">
+        <h2 class="card-title">Thông tin phiếu đã lưu</h2>
+        <dl class="row">
+            <dt class="col-md-3">Ngày cấp phát trên phiếu</dt><dd class="col-md-9">@(Model.Phieu.NgayCapPhat?.ToString("dd/MM/yyyy") ?? "Chưa có")</dd>
+            <dt class="col-md-3">Người giao</dt><dd class="col-md-9">@(Model.Phieu.NguoiGiao ?? "Chưa có")</dd>
+            <dt class="col-md-3">Người nhận ghi trên phiếu</dt><dd class="col-md-9">@(Model.Phieu.NguoiNhan ?? "Chưa có")</dd>
+            <dt class="col-md-3">Phòng ban</dt><dd class="col-md-9">@Model.Phieu.PhongBan</dd>
+            <dt class="col-md-3">Trạng thái phiếu</dt><dd class="col-md-9">@GiaoNhanUi.State(Model.Phieu.TrangThai)
+                @if (Model.Phieu.CanDoiSoat) { <span class="badge bg-warning text-dark">Cần đối soát — chưa xác minh trách nhiệm</span> }
+            </dd>
+            <dt class="col-md-3">Tổng hợp thu hồi</dt><dd class="col-md-9">@Model.Phieu.ThuHoiLabel (@Model.Phieu.SoDaThuHoi / @Model.Phieu.SoTaiSan tài sản)</dd>
+            <dt class="col-md-3">Lý do / mục đích</dt><dd class="col-md-9 text-break">@Model.Phieu.LyDo</dd>
+            <dt class="col-md-3">Ghi chú</dt><dd class="col-md-9 text-break">@Model.Phieu.GhiChu</dd>
+        </dl>
+        @if (Model.Phieu.CanDoiSoat)
+        {
+            <p class="text-muted">Chưa có dữ liệu xác minh ngày lập, ngày hẹn trả hoặc thời điểm/người xác nhận bàn giao.</p>
+        }
+        else
+        {
+            <dl class="row">
+                <dt class="col-md-3">Ngày lập (giờ Việt Nam)</dt><dd class="col-md-9">@Model.Phieu.NgayLapUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss")</dd>
+                <dt class="col-md-3">Thực hiện thực tế</dt><dd class="col-md-9">@(Model.Phieu.ThucHienUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss") ?? "Chưa thực hiện")</dd>
+                <dt class="col-md-3">Ghi nhận xác nhận</dt><dd class="col-md-9">@(Model.Phieu.XacNhanUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss") ?? "Chưa xác nhận") · @Model.Phieu.NguoiXacNhan</dd>
+            </dl>
+        }
+        <h2 class="card-title">Từng tài sản và dữ liệu giao / nhận</h2>
+        <div class="table-responsive"><table class="table table-hover align-middle">
+            <thead><tr><th>Tài sản</th><th>Danh mục / trách nhiệm</th><th>Tình trạng khi giao</th><th>Ngày thu hồi đã lưu</th><th>Tình trạng khi thu hồi</th><th>Ghi chú / phụ kiện / vị trí đã lưu</th><th>Thao tác</th></tr></thead>
+            <tbody>
+                @if (Model.Items.Count == 0) { <tr><td colspan="7" class="text-center py-4">Phiếu chưa có tài sản.</td></tr> }
+                @foreach (var line in Model.Items)
+                {
+                    <tr>
+                        <td>@if(ViewData["CanManage"] is not false){<a asp-controller="TaiSan" asp-action="Details" asp-route-id="@line.TaiSanId">@line.MaTaiSan</a>}else{<span>@line.MaTaiSan</span>}<br />@line.TenTaiSan</td>
+                        <td>@line.DanhMuc<br /><span class="badge bg-secondary">@GiaoNhanUi.State(line.TrangThaiDong)</span></td><td>@GiaoNhanUi.Condition(line.TinhTrangKhiGiao)</td>
+                        <td>@(line.NgayThuHoi?.ToString("dd/MM/yyyy") ?? "Chưa ghi nhận")</td>
+                        <td>@GiaoNhanUi.Condition(line.TinhTrangKhiThuHoi)</td><td class="text-break">@line.GhiChu<br />@line.PhuKienSnapshot<br />@line.ViTriSnapshot</td>
+                        <td><a asp-action="History" asp-route-id="@line.TaiSanId" class="btn btn-sm btn-outline-secondary">Lịch sử</a>
+                            @if(ViewData["CanManage"] is not false && line.TrangThaiDong==GiaoNhanStates.Active){<a asp-action="Incident" asp-route-id="@line.Id" class="btn btn-sm btn-outline-danger">Sự việc / tìm thấy</a>}
+                            @if(ViewData["CanManage"] is not false && line.TrangThaiDong==GiaoNhanStates.Received){<a asp-action="Inspect" asp-route-id="@line.TaiSanId" class="btn btn-sm btn-outline-warning">Kiểm tra</a>}
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table></div>
+        <partial name="_Pagination" model="Model" />
+        <h2 class="card-title">Mốc thời gian có trong dữ liệu</h2>
+        <p>Ngày cấp phát ghi trên phiếu: <strong>@(Model.Phieu.NgayCapPhat?.ToString("dd/MM/yyyy") ?? "Chưa có")</strong>.</p>
+        <p>Các ngày nhận lại và tình trạng từng tài sản được trình bày trong bảng. Phiếu lịch sử chưa đối soát chưa đủ dữ liệu để khẳng định thời điểm xác nhận.</p>
+    </div></div>
+    <div class="card"><div class="card-body">
+    <h2 class="card-title">Dòng thời gian và audit</h2>
+    @if(Model.Events.Count==0){<p class="text-muted">Chưa có sự kiện xác minh mới. Ngày ghi trong phiếu cũ được giữ nguyên, không tạo xác nhận giả.</p>}
+    <ol class="list-group list-group-numbered mb-3">
+    @foreach(var item in Model.Events){<li class="list-group-item"><strong>@GiaoNhanUi.Event(item.Type)</strong> · @item.AtUtc.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss") · @item.Actor<div class="text-break">@item.Reason</div></li>}
+    </ol>
+    <div class="d-flex justify-content-between"><small>Audit @Model.EventPage / @Model.EventPages · @Model.EventTotal sự kiện</small><div class="btn-group">
+        @if(Model.EventPage>1){<a asp-action="Details" asp-route-id="@Model.Phieu.Id" asp-route-page="@Model.Page" asp-route-eventPage="@(Model.EventPage-1)" class="btn btn-sm btn-outline-secondary">Audit trước</a>}
+        @if(Model.EventPage<Model.EventPages){<a asp-action="Details" asp-route-id="@Model.Phieu.Id" asp-route-page="@Model.Page" asp-route-eventPage="@(Model.EventPage+1)" class="btn btn-sm btn-outline-secondary">Audit sau</a>}
+    </div></div>
+</div></div>
+</main>

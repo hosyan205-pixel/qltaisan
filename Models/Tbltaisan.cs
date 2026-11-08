@@ -49,6 +49,9 @@ namespace DoAn.Models
 
         [Column("TS_NgayTao")]
         public DateTime TS_NgayTao { get; set; } = DateTime.Now;
+        [StringLength(100)] public string? TS_Serial { get; set; }
+        [StringLength(150)] public string? TS_ViTri { get; set; }
+        public bool TS_DangQuanLy { get; set; } = true;
 
         [ForeignKey(nameof(DMTS_ID))]
         public virtual tblDanhMucTaiSan? tblDanhMucTaiSan { get; set; }

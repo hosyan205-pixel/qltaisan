@@ -42,7 +42,7 @@ namespace DoAn.Controllers
                 return View(model);
             }
 
-            if (taiKhoan.TK_VaiTro != "Admin" && taiKhoan.TK_VaiTro != "NhanVien")
+            if (taiKhoan.TK_VaiTro is not ("Admin" or "NhanVien" or "QuanLyTaiSan"))
             {
                 ModelState.AddModelError(string.Empty, "Vai trò tài khoản không hợp lệ.");
 
@@ -62,6 +62,9 @@ namespace DoAn.Controllers
             Console.WriteLine("Tên đăng nhập: " + HttpContext.Session.GetString("TenDangNhap"));
 
             Console.WriteLine("Họ tên: " + HttpContext.Session.GetString("HoTen"));
+
+            if (taiKhoan.TK_VaiTro == "QuanLyTaiSan")
+                return RedirectToAction("Index", "KiemKe", new { area = "Admin" });
 
             if (taiKhoan.TK_VaiTro == "Admin")
             {

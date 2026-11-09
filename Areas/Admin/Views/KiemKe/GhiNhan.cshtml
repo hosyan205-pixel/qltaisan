@@ -1,0 +1,12 @@
+@model KiemKeGhiNhanForm
+@{ ViewData["Title"]="Ghi nhận thực tế"; ViewData["PhongBans"]=Model.PhongBans; ViewData["NguoiDungs"]=Model.NguoiDungs; var row=Model.Dong; }
+<main id="main" class="main">
+<h1 class="h4">Ghi nhận thực tế — @(row.Dong.CTKK_MaTaiSanSnapshot??row.Dong.CTKK_MaPhatHien)</h1><partial name="_DieuHuong" />
+<div class="alert alert-info">Sổ đã chốt: @row.Dong.CTKK_TenTaiSanSnapshot · @row.Dong.CTKK_SerialDuKien · @row.Dong.CTKK_PhongBanDuKienSnapshot · @row.Dong.CTKK_NguoiNhanDuKienSnapshot · @row.Dong.CTKK_ViTriDuKien · @row.Dong.CTKK_TinhTrangDuKien</div>
+@if(row.Dong.CTKK_CanhBaoNguon!=null){<div class="alert alert-warning">@row.Dong.CTKK_CanhBaoNguon</div>}
+@if(row.BienDong || row.HienTai?.XungDot==true){<div class="alert alert-warning">Sổ hiện tại đã thay đổi hoặc có xung đột nguồn. @row.HienTai?.CanhBao Snapshot được giữ nguyên. Cần đối chiếu chứng từ trước khi gửi duyệt.</div>}
+<div class="card"><div class="card-body pt-3"><form asp-action="GhiNhan" asp-route-id="@row.Dong.CTKK_ID" method="post">
+<div class="d-flex flex-wrap gap-2 mb-3"><button type="button" data-observation="CoMat" class="btn btn-outline-success">Tìm thấy – khớp</button><button type="button" data-observation="CoMat" class="btn btn-outline-warning">Tìm thấy – có chênh lệch</button><button type="button" data-observation="KhongThay" class="btn btn-outline-danger">Không tìm thấy</button><button type="button" data-observation="CanXacMinh" class="btn btn-outline-secondary">Cần xác minh</button></div>
+<partial name="_GhiNhan" model="Model" /><div class="mt-3"><button class="btn btn-primary">Ghi nhận</button> <a asp-action="Details" asp-route-id="@row.Dong.KK_ID" class="btn btn-outline-secondary">Quay lại đợt</a></div></form></div></div>
+<script>document.querySelectorAll('[data-observation]').forEach(button=>button.addEventListener('click',()=>{const select=document.getElementById('CachGhiNhan');select.value=button.dataset.observation;select.focus();}));</script>
+</main>

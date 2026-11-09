@@ -1,0 +1,32 @@
+@model KiemKeIndex
+@{
+    const string action = "Index";
+    ViewData["Title"] = "Danh sách đợt kiểm kê";
+}
+<main id="main" class="main">
+<h1 class="h4">@ViewData["Title"]</h1>
+<p class="text-muted">Tra cứu đợt kiểm kê và mở chi tiết để ghi nhận, đối soát hoặc phê duyệt theo quyền được giao.</p>
+<partial name="_DieuHuong" />
+<div class="card"><div class="card-body pt-3">
+    <form method="get" asp-action="@action" class="row g-3">
+        <div class="col-md-4"><label asp-for="Keyword" class="form-label">Mã, tên đợt</label><input asp-for="Keyword" maxlength="150" class="form-control" /></div>
+        <div class="col-md-4"><label asp-for="PhongBanId" class="form-label">Phòng ban</label><select asp-for="PhongBanId" asp-items="Model.PhongBans" class="form-select"><option value="">Tất cả phạm vi được xem</option></select></div>
+        <div class="col-md-4"><label asp-for="TrangThai" class="form-label">Trạng thái</label><select asp-for="TrangThai" class="form-select"><option value="">Tất cả</option>@foreach(var state in KiemKeUi.States){<option value="@state">@KiemKeUi.Label(state)</option>}</select></div>
+        <div class="col-md-3"><label asp-for="TuNgay" class="form-label">Từ ngày dự kiến</label><input asp-for="TuNgay" type="date" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="DenNgay" class="form-label">Đến ngày dự kiến</label><input asp-for="DenNgay" type="date" class="form-control" /><span asp-validation-for="DenNgay" class="text-danger"></span></div>
+        <div class="col-md-3 align-self-end"><label><input asp-for="ChiLichSu" class="form-check-input" /> Chỉ dữ liệu lịch sử</label></div>
+        <div class="col-md-3 align-self-end"><button class="btn btn-primary">Lọc</button> <a asp-action="@action" class="btn btn-outline-secondary">Đặt lại</a></div>
+    </form>
+</div></div>
+<div class="card"><div class="card-body pt-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3"><span>@Model.Total đợt phù hợp.</span><a asp-action="BaoCao" asp-all-route-data="Model.Routes(1)" class="btn btn-outline-primary">Xem báo cáo theo bộ lọc này</a></div>
+    <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Đợt kiểm kê</th><th>Phạm vi</th><th>Ngày dự kiến</th><th>Kiểm kê viên</th><th>Tiến độ</th><th>Chênh lệch</th><th>Trạng thái</th><th></th></tr></thead><tbody>
+    @foreach(var item in Model.Items)
+    {
+        <tr><td><strong>@item.Ma</strong><br />@item.Ten @if(item.LaDuLieuCu){<span class="badge bg-secondary">Lịch sử, chỉ đọc</span>}</td><td>@KiemKeUi.Label(item.PhamVi)<br />@item.PhongBan</td><td>@item.Ngay?.ToString("dd/MM/yyyy")</td><td>@item.NguoiKiemKe</td><td>@item.TienDo</td><td>@(item.LaDuLieuCu ? "Không gộp KPI" : item.ChenhLech.ToString())</td><td><span class="badge bg-@(item.TrangThai == "HoanThanh" ? "success" : "primary")">@KiemKeUi.Label(item.TrangThai)</span></td><td><a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm">Chi tiết</a></td></tr>
+    }
+    @if(Model.Items.Count == 0){<tr><td colspan="8">Không có đợt phù hợp.</td></tr>}
+    </tbody></table></div>
+    <nav aria-label="Phân trang"><ul class="pagination">@for(var p = Math.Max(1,Model.Page-2); p<= Math.Min(Model.Pages,Model.Page+2);p++){<li class="page-item @(p==Model.Page?"active":"")"><a class="page-link" asp-action="@action" asp-all-route-data="Model.Routes(p)">@p</a></li>}</ul></nav>
+</div></div>
+</main>

@@ -16,6 +16,9 @@ namespace DoAn.Areas.Admin.Components
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
+            if (HttpContext.Items["KiemKeRestricted"] is true)
+                return View(Array.Empty<DoAn.Areas.Admin.Models.AdminMenu>());
+
             var menu = await _context.AdminMenus
                 .AsNoTracking()
                 .Where(m => m.IsActive == true)

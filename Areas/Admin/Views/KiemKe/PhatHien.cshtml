@@ -1,0 +1,12 @@
+@model KiemKePhatHienForm
+@{ ViewData["Title"]="Phát hiện ngoài danh sách"; ViewData["PhongBans"]=Model.PhongBans; ViewData["NguoiDungs"]=Model.NguoiDungs; }
+<main id="main" class="main">
+<h1 class="h4">Phát hiện tài sản ngoài danh sách kiểm kê</h1><partial name="_DieuHuong" />
+<div class="alert alert-info">Tra cứu mã hoặc serial trước. Tài sản đã có trong hệ thống dùng TS_ID thật để ghi ngoài phạm vi. Hiện vật chưa có trong hệ thống ghi ngoài sổ với mã phát hiện tạm, không tạo hồ sơ tài sản.</div>
+<div class="card"><div class="card-body pt-3"><form asp-action="PhatHienNgoaiDanhSach" asp-route-id="@Model.DotId" method="get" class="d-flex gap-2"><input name="keyword" value="@Model.Keyword" maxlength="150" aria-label="Tìm tài sản đã có" placeholder="Mã, tên hoặc serial" class="form-control" required /><button class="btn btn-outline-primary">Tra cứu</button></form>
+@if(Model.Keyword!=null){<p class="mt-2">Tối đa 50 kết quả. Tra cứu cụ thể hơn nếu chưa tìm thấy mã cần chọn.</p><ul>@foreach(var asset in Model.TaiSans){<li>#@asset.Id · @asset.Ma · @asset.Ten · @asset.Serial · @asset.PhongBan</li>}</ul>}</div></div>
+<div class="card"><div class="card-body pt-3"><form asp-action="PhatHienNgoaiDanhSach" asp-route-id="@Model.DotId" method="post">
+    <div class="row g-3 mb-3"><div class="col-md-6"><label asp-for="TaiSanId" class="form-label">TS_ID thật (để trống khi chưa có hồ sơ)</label><input asp-for="TaiSanId" type="number" min="1" class="form-control" /></div><div class="col-md-6"><label asp-for="MaPhatHien" class="form-label">Mã phát hiện tạm ngoài sổ</label><input asp-for="MaPhatHien" maxlength="50" pattern="[A-Za-z0-9][A-Za-z0-9._-]{0,49}" class="form-control" /><small>Chữ không dấu, số, dấu chấm, gạch ngang hoặc gạch dưới; để trống để sinh mã tự động.</small></div><div class="col-12"><label asp-for="TenThucTe" class="form-label">Tên hiện vật phát hiện</label><input asp-for="TenThucTe" required maxlength="150" class="form-control" /></div></div>
+    <partial name="_GhiNhan" model="Model" /><div class="mt-3"><button class="btn btn-primary">Ghi nhận phát hiện</button> <a asp-action="Details" asp-route-id="@Model.DotId" class="btn btn-outline-secondary">Quay lại đợt</a></div>
+</form></div></div>
+</main>

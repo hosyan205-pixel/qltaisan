@@ -1,0 +1,8 @@
+@model bool
+@{ ViewData["Title"] = "Kiểm kê chưa sẵn sàng"; }
+<main id="main" class="main">
+<h1 class="h4">Kiểm kê tài sản chưa sẵn sàng</h1>
+<div class="alert alert-warning">Chưa thể xác minh kết nối, quyền truy cập hoặc cấu trúc dữ liệu Sprint 3. Thao tác kiểm kê chưa được thực hiện.</div>
+@if(Model){<p>Kiểm tra log ứng dụng và bản backup trước khi cập nhật. File cập nhật cho nhóm: <code>2026_11_09_sprint3_kiemke_migration.sql</code>. Chỉ chạy một lần sau khi đã xác minh database đích và khôi phục thử backup.</p>}
+<a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">Về trang chính</a>
+</main>

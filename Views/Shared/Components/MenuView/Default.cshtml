@@ -1,7 +1,11 @@
 @model IEnumerable<DoAn.Models.tblMenu>
 
 <nav>
-    @if(Context.Session.GetInt32("TaiKhoanID").HasValue){<a class="nav-item" asp-area="Admin" asp-controller="CapPhat" asp-action="ActiveAssignments">Tài sản của tôi</a>}
+    @if(Context.Session.GetInt32("TaiKhoanID").HasValue)
+    {
+        @if(Context.Session.GetString("VaiTro") != "QuanLyTaiSan"){<a class="nav-item" asp-area="Admin" asp-controller="CapPhat" asp-action="ActiveAssignments">Tài sản của tôi</a>}
+        <a class="nav-item" asp-area="Admin" asp-controller="KiemKe" asp-action="Index">Kiểm kê tài sản</a>
+    }
     @foreach (var item in Model.Where(m => m.Levels == 1).OrderBy(m => m.MenuOrder))
     {
         <a class="nav-item" href="@item.Link">@item.MenuName</a>

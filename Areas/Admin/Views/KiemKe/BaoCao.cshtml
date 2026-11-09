@@ -1,0 +1,63 @@
+@model KiemKeBaoCao
+@{ ViewData["Title"] = "Báo cáo kiểm kê tài sản"; }
+<main id="main" class="main">
+<h1 class="h4">Báo cáo kiểm kê tài sản</h1>
+<p class="text-muted">Tổng hợp tiến độ, chênh lệch và xử lý theo phạm vi kiểm kê. Số liệu bao gồm toàn bộ đợt phù hợp bộ lọc.</p>
+<partial name="_DieuHuong" />
+<div class="card"><div class="card-body pt-3">
+    <h2 class="h5">Phạm vi báo cáo</h2>
+    <form method="get" asp-action="BaoCao" class="row g-3">
+        <div class="col-md-3"><label asp-for="TuNgay" class="form-label">Từ ngày dự kiến</label><input asp-for="TuNgay" type="date" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="DenNgay" class="form-label">Đến ngày dự kiến</label><input asp-for="DenNgay" type="date" class="form-control" /><span asp-validation-for="DenNgay" class="text-danger"></span></div>
+        <div class="col-md-3"><label asp-for="PhongBanId" class="form-label">Phòng ban của đợt</label><select asp-for="PhongBanId" asp-items="Model.PhongBans" class="form-select"><option value="">Tất cả phạm vi được xem</option></select></div>
+        <div class="col-md-3"><label asp-for="TrangThai" class="form-label">Trạng thái đợt</label><select asp-for="TrangThai" class="form-select"><option value="">Tất cả trạng thái</option>@foreach(var state in KiemKeUi.States){<option value="@state">@KiemKeUi.Label(state)</option>}</select></div>
+        <div class="col-md-6"><label asp-for="Keyword" class="form-label">Mã hoặc tên đợt</label><input asp-for="Keyword" maxlength="150" class="form-control" /></div>
+        <div class="col-md-3 align-self-end"><label><input asp-for="ChiLichSu" class="form-check-input" /> Chỉ dữ liệu lịch sử</label></div>
+        <div class="col-md-3 align-self-end"><button class="btn btn-primary">Xem báo cáo</button> <a asp-action="BaoCao" class="btn btn-outline-secondary">Đặt lại</a></div>
+    </form>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+        <a asp-action="XuatBaoCao" asp-all-route-data="Model.Routes(1)" class="btn btn-outline-success">CSV chi tiết mở bằng Excel</a>
+        <a asp-action="Index" asp-all-route-data="Model.Routes(1)" class="btn btn-outline-primary">Tra cứu các đợt trong báo cáo</a>
+    </div>
+    <small class="d-block mt-2 text-muted">CSV gồm các dòng tài sản của toàn bộ bộ lọc; đợt nháp chưa có tài sản không có dòng chi tiết. Chọn trạng thái Hoàn thành khi cần riêng số liệu đã phê duyệt.</small>
+</div></div>
+<div class="row g-3 mb-3">
+    @foreach(var item in new Dictionary<string,int>{["Tổng đợt phù hợp"]=Model.Total,["Đợt theo quy trình mới"]=Model.SoDotMoi,["Đợt mới đã chốt sổ"]=Model.SoDotDaChot,["Đợt lịch sử"]=Model.SoDotLichSu})
+    {<div class="col-6 col-xl-3"><div class="card h-100 mb-0"><div class="card-body pt-3"><div class="text-muted">@item.Key</div><strong class="fs-3">@item.Value</strong></div></div></div>}
+</div>
+@if(Model.SoDotDaChot>0)
+{
+    <partial name="_TongHop" model="Model.TongHop" />
+}
+else
+{
+    <div class="alert alert-info">Bộ lọc chưa có đợt mới đã chốt sổ để tính tiến độ và chênh lệch theo quy trình mới. Phiếu lịch sử vẫn được tổng hợp riêng bên dưới.</div>
+}
+<div class="row">
+    <div class="col-xl-7"><div class="card"><div class="card-body pt-3">
+        <h2 class="h5">Phân bố trạng thái đợt</h2>
+        <div class="table-responsive"><table class="table"><thead><tr><th>Trạng thái</th><th class="text-end">Đợt mới</th><th class="text-end">Lịch sử</th><th class="text-end">Tổng đợt</th></tr></thead><tbody>
+        @foreach(var item in Model.TheoTrangThai)
+        {<tr><td>@KiemKeUi.Label(item.TrangThai)<meter class="d-block w-100 mt-1" min="0" max="@Math.Max(1,Model.Total)" value="@item.TongSo" aria-label="@KiemKeUi.Label(item.TrangThai): @item.TongSo trên @Model.Total đợt">@item.TongSo</meter></td><td class="text-end">@item.SoDotMoi</td><td class="text-end">@item.SoDotLichSu</td><td class="text-end fw-bold">@item.TongSo</td></tr>}
+        @if(Model.TheoTrangThai.Count==0){<tr><td colspan="4">Không có đợt phù hợp bộ lọc.</td></tr>}
+        </tbody></table></div>
+    </div></div></div>
+    <div class="col-xl-5"><div class="card"><div class="card-body pt-3">
+        <h2 class="h5">Kết quả dữ liệu lịch sử</h2>
+        <p class="small text-muted">Giữ nguyên kết quả trước nâng cấp; không dùng để suy ra số lượng dự kiến hay tiến độ kiểm kê mới.</p>
+        <table class="table"><thead><tr><th>Kết quả đã lưu</th><th class="text-end">Dòng tài sản</th></tr></thead><tbody>
+        @foreach(var item in Model.KetQuaLichSu.OrderBy(x=>x.Key)){<tr><td>@KiemKeUi.Label(item.Key)</td><td class="text-end">@item.Value</td></tr>}
+        @if(Model.KetQuaLichSu.Count==0){<tr><td colspan="2">Không có chi tiết lịch sử trong bộ lọc.</td></tr>}
+        </tbody></table>
+    </div></div></div>
+</div>
+<div class="card"><div class="card-body pt-3">
+    <h2 class="h5">So sánh theo phạm vi kiểm kê</h2>
+    <p class="small text-muted">Gộp theo phạm vi của đợt, không suy diễn phòng ban hiện tại của tài sản. Cùng tài sản ở nhiều đợt được tính thành nhiều dòng kiểm kê. Dấu — nghĩa là phạm vi chưa có dữ liệu chốt theo quy trình mới.</p>
+    <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Phạm vi</th><th>Đợt</th><th>Lịch sử</th><th>Đã chốt mới</th><th>Dự kiến</th><th>Đã kiểm trong sổ</th><th>Tiến độ</th><th>Dòng chênh lệch</th><th>Chưa đối soát</th><th>Đã xử lý</th></tr></thead><tbody>
+    @foreach(var item in Model.TheoPhamVi)
+    {<tr><td>@item.TenPhamVi</td><td>@item.SoDot</td><td>@item.SoDotLichSu</td><td>@item.SoDotDaChot</td><td>@(item.SoDotDaChot==0?"—":item.DuKien.ToString())</td><td>@(item.SoDotDaChot==0?"—":item.DaKiem.ToString())</td><td>@item.TienDo</td><td>@(item.SoDotDaChot==0?"—":item.ChenhLech.ToString())</td><td>@(item.SoDotDaChot==0?"—":item.ChuaDoiSoat.ToString())</td><td>@(item.SoDotDaChot==0?"—":item.DaXuLy.ToString())</td></tr>}
+    @if(Model.TheoPhamVi.Count==0){<tr><td colspan="10">Không có phạm vi phù hợp bộ lọc.</td></tr>}
+    </tbody></table></div>
+</div></div>
+</main>

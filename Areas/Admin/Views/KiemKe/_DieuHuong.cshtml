@@ -1,0 +1,24 @@
+@{ var currentAction = ViewContext.RouteData.Values["action"]?.ToString(); }
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-action="Index" class="btn @(currentAction=="Index"?"btn-primary":"btn-outline-primary")" aria-current="@(currentAction=="Index"?"page":null)">Danh sách đợt kiểm kê</a>
+    <a asp-action="BaoCao" class="btn @(currentAction=="BaoCao"?"btn-primary":"btn-outline-primary")" aria-current="@(currentAction=="BaoCao"?"page":null)">Báo cáo kiểm kê</a>
+    @if (ViewData["KiemKeCanManage"] is true)
+    {
+        <a asp-action="Create" class="btn btn-primary">Lập đợt kiểm kê</a>
+        <a asp-action="NguonDuLieu" class="btn btn-outline-warning">Dữ liệu nguồn cần kiểm tra</a>
+    }
+</div>
+@if (TempData["KiemKeSuccess"] is string success)
+{
+    <div class="alert alert-success" role="status">@success</div>
+}
+@if (TempData["KiemKeError"] is string error)
+{
+    <div class="alert alert-danger" role="alert">@error</div>
+}
+<script>
+document.addEventListener('submit', function (event) {
+    const message = event.target.getAttribute('data-confirm');
+    if (message && !window.confirm(message)) event.preventDefault();
+});
+</script>

@@ -38,6 +38,8 @@ internal static partial class Program
     {
         try
         {
+            if (args.Contains("--kiemke-reports")) return await RunInventoryReportChecks();
+            if (args.Contains("--sprint3")) return await RunSprint3();
             if (args.Contains("--sprint2-stage")) return await RunSprint2Stage();
             if (args.Contains("--primary-readonly")) return await RunPrimaryReadOnly();
             if (args.Contains("--category-delete")) return await RunCategoryDeleteChecks();
@@ -771,7 +773,7 @@ internal static partial class Program
                 case "maintenance":
                     Db.tblBaoTriTaiSan.Add(new tblBaoTriTaiSan { TS_ID = First.TS_ID, BT_NguoiLapID = account.TK_ID, BT_MaPhieu = "BT", BT_NgayBaoTri = AssetDisplay.Today, BT_LyDo = "Test", BT_TrangThai = "ChoXuLy" }); break;
                 case "inventory":
-                    var inventory = new tblKiemKeTaiSan { KK_MaPhieu = "KK", KK_NguoiKiemKeID = account.TK_ID, KK_NgayKiemKe = AssetDisplay.Today, KK_TrangThai = "DangKiemKe" };
+                    var inventory = new tblKiemKeTaiSan { KK_MaPhieu = "KK", KK_NguoiKiemKeID = account.TK_ID, KK_NgayKiemKe = AssetDisplay.Today, KK_TrangThai = "DangKiemKe", KK_LoaiPhamVi = "ToanBo" };
                     Db.tblChiTietKiemKe.Add(new tblChiTietKiemKe { TS_ID = First.TS_ID, KiemKe = inventory, CTKK_KetQua = "BinhThuong" }); break;
                 case "disposal":
                     var disposal = new tblThanhLyTaiSan { TL_MaPhieu = "TL", TL_NguoiLapID = account.TK_ID, TL_NgayThanhLy = AssetDisplay.Today, TL_LyDo = "Test", TL_TrangThai = "ChoDuyet" };

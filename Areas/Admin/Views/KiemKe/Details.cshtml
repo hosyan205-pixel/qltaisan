@@ -1,0 +1,86 @@
+@model KiemKeChiTiet
+@{ var doc=Model.Phieu; ViewData["Title"]="Kiểm kê "+doc.KK_MaPhieu; }
+<main id="main" class="main">
+<h1 class="h4">@doc.KK_MaPhieu — @doc.KK_TenDot</h1><partial name="_DieuHuong" />
+<div class="card"><div class="card-body pt-3">
+    <p><span class="badge bg-primary">@KiemKeUi.Label(doc.KK_TrangThai)</span> @KiemKeUi.Label(doc.KK_LoaiPhamVi) · @doc.PhongBan?.PB_TenPhongBan</p>
+    <p>Ngày dự kiến: @doc.KK_NgayKiemKe?.ToString("dd/MM/yyyy") — @doc.KK_NgayKetThucDuKien?.ToString("dd/MM/yyyy") · Kiểm kê viên: <strong>@doc.NguoiKiemKe?.TK_HoTen</strong></p>
+    @if(doc.KK_LaDuLieuCu){<div class="alert alert-warning">Dữ liệu kiểm kê lịch sử, chỉ đọc. Phiếu không có snapshot tại thời điểm kiểm kê; mã/tên tài sản tham chiếu hiện tại chỉ giúp tra cứu. Kết quả cũ được giữ nguyên và không gộp KPI kiểm kê mới.</div>}
+    else
+    {
+        <p class="small">Người tạo: @doc.NguoiTao?.TK_HoTen · Chốt sổ: @(doc.KK_ThoiDiemChotUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss")??"Chưa chốt") (giờ Việt Nam)</p>
+        @if(doc.DotGoc!=null){<p>Đợt bổ sung cho <a asp-action="Details" asp-route-id="@doc.KK_DotGocID">@doc.DotGoc.KK_MaPhieu</a>.</p>}
+        @if(doc.KK_LyDoTraLai!=null){<div class="alert alert-warning">Lý do trả lại: @doc.KK_LyDoTraLai</div>}
+        @if(doc.KK_LyDoHuy!=null){<div class="alert alert-secondary">Lý do hủy: @doc.KK_LyDoHuy · @doc.KK_NgayHuyUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm")</div>}
+        @if(doc.KK_TrangThai=="HoanThanh"){<div class="alert alert-success">Người duyệt: @doc.NguoiDuyet?.TK_HoTen · @doc.KK_NgayDuyetUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss") (giờ Việt Nam)<br />Kết luận: @doc.KK_KetLuan</div>}
+    }
+    <p style="white-space:pre-wrap">@doc.KK_GhiChu</p>
+    <div class="d-flex flex-wrap gap-2">
+        <a asp-action="LichSu" asp-route-id="@doc.KK_ID" class="btn btn-outline-secondary">Nhật ký đầy đủ</a>
+        <a asp-action="DanhSachKiemKe" asp-route-id="@doc.KK_ID" asp-route-ketQua="ChenhLech" class="btn btn-outline-warning">Đối soát chênh lệch</a>
+        <a asp-action="XuatBaoCao" asp-route-id="@doc.KK_ID" class="btn btn-outline-success">CSV mở bằng Excel</a>
+        <a asp-action="InBienBan" asp-route-id="@doc.KK_ID" target="_blank" class="btn btn-outline-secondary">In biên bản</a>
+        @if(!doc.KK_LaDuLieuCu && doc.KK_TrangThai=="Nhap" && Model.CanManage)
+        {
+            <a asp-action="Edit" asp-route-id="@doc.KK_ID" class="btn btn-primary">Sửa nháp</a>
+            <form asp-action="BatDau" asp-route-id="@doc.KK_ID" method="post" data-confirm="Bắt đầu kiểm kê và chốt dữ liệu sổ một lần? Phạm vi và người được giao sẽ bị khóa."><input name="RequestKey" value="@Guid.NewGuid()" type="hidden" /><input name="PhienBan" value="@doc.KK_PhienBan" type="hidden" /><button class="btn btn-warning">Bắt đầu và chốt dữ liệu</button></form>
+        }
+        @if(Model.CanRecord)
+        {
+            <a asp-action="PhatHienNgoaiDanhSach" asp-route-id="@doc.KK_ID" class="btn btn-outline-primary">Phát hiện ngoài danh sách</a>
+            <form asp-action="GuiDuyet" asp-route-id="@doc.KK_ID" method="post" data-confirm="Gửi kết quả để quản lý phê duyệt? Hệ thống sẽ kiểm tra toàn bộ các dòng."><input name="RequestKey" value="@Guid.NewGuid()" type="hidden" /><input name="PhienBan" value="@doc.KK_PhienBan" type="hidden" /><button class="btn btn-primary">Gửi duyệt</button></form>
+        }
+        @if(!doc.KK_LaDuLieuCu && doc.KK_TrangThai=="HoanThanh" && Model.CanManage){<a asp-action="Create" asp-route-dotGocId="@doc.KK_ID" class="btn btn-outline-primary">Lập đợt bổ sung</a>}
+    </div>
+    @if(!doc.KK_LaDuLieuCu && Model.CanManage && doc.KK_TrangThai=="ChoDuyet")
+    {
+        <div class="border rounded p-3 mt-3"><p>Người được giao kiểm kê không được tự duyệt. Nếu người duyệt từng ghi nhận kết quả, các dòng đó cần người khác đối soát độc lập.</p>
+        @foreach(var action in new[]{"Duyet","TraLai"})
+        {<form asp-action="@action" asp-route-id="@doc.KK_ID" method="post" class="d-flex flex-wrap gap-2 mb-2" data-confirm="@(action=="Duyet"?"Phê duyệt và khóa kết quả gốc của đợt?":"Trả lại để kiểm kê viên bổ sung? Dữ liệu chốt được giữ nguyên.")"><input name="RequestKey" value="@Guid.NewGuid()" type="hidden" /><input name="PhienBan" value="@doc.KK_PhienBan" type="hidden" /><label class="flex-grow-1">@(action=="Duyet"?"Nhận xét / kết luận phê duyệt":"Lý do trả lại")<textarea name="LyDo" required maxlength="4000" class="form-control" rows="2"></textarea></label><button class="btn btn-@(action=="Duyet"?"success":"warning") align-self-end">@KiemKeUi.Label(action)</button></form>}
+        </div>
+    }
+    @if(!doc.KK_LaDuLieuCu && Model.CanManage && doc.KK_TrangThai is "Nhap" or "DangKiemKe" or "ChoDuyet")
+    {<details class="mt-3"><summary>Hủy đợt kiểm kê</summary><form asp-action="Huy" asp-route-id="@doc.KK_ID" method="post" class="mt-2" data-confirm="Hủy đợt này? Đợt đã hủy không mở lại được; lịch sử sẽ được giữ nguyên."><input name="RequestKey" value="@Guid.NewGuid()" type="hidden" /><input name="PhienBan" value="@doc.KK_PhienBan" type="hidden" /><label>Lý do hủy<textarea name="LyDo" required maxlength="4000" class="form-control" rows="2"></textarea></label> <button class="btn btn-outline-danger">Xác nhận hủy</button></form></details>}
+    @if(!doc.KK_LaDuLieuCu && Model.CanManage && doc.KK_TrangThai=="DangKiemKe")
+    {<details class="mt-3"><summary>Thay đổi người phụ trách có căn cứ</summary><form asp-action="DoiNguoiKiemKe" asp-route-id="@doc.KK_ID" method="post" data-confirm="Phân công cho người mới? Người ghi nhận trước đây và toàn bộ lịch sử được giữ nguyên."><input name="RequestKey" type="hidden" value="@Guid.NewGuid()" /><input name="PhienBan" type="hidden" value="@doc.KK_PhienBan" /><label>Người phụ trách mới<select name="NguoiKiemKeId" asp-items="Model.NguoiKiemKes" required class="form-select"><option value="">Chọn tài khoản</option></select></label><label>Lý do / căn cứ phân công<textarea name="LyDo" required maxlength="4000" class="form-control"></textarea></label> <button class="btn btn-outline-primary">Lưu phân công</button></form></details>}
+</div></div>
+@if(!doc.KK_LaDuLieuCu){<partial name="_TongHop" model="Model.TongHop" />}
+@foreach(var warning in Model.CanhBaos){<div class="alert alert-warning">@warning</div>}
+<div class="card"><div class="card-body pt-3">
+    <h2 class="h5">Sổ đã chốt và ghi nhận thực tế</h2>
+    <form method="get" asp-action="DanhSachKiemKe" asp-route-id="@doc.KK_ID" class="d-flex flex-wrap gap-2 mb-3"><input asp-for="Keyword" maxlength="150" aria-label="Tìm mã, tên, serial" placeholder="Mã, tên, serial" class="form-control w-auto" /><select asp-for="KetQua" aria-label="Lọc kết quả" class="form-select w-auto"><option value="">Tất cả kết quả</option><option value="ChenhLech">Tất cả chênh lệch</option>@foreach(var result in KiemKeUi.Results){<option value="@result">@KiemKeUi.Label(result)</option>}</select><button class="btn btn-primary">Lọc dòng</button></form>
+    <p>@Model.Total dòng phù hợp · Trang @Model.Page/@Model.Pages</p>
+    <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Tài sản</th><th>Sổ tại thời điểm chốt</th><th>Thực tế ghi nhận</th><th>Kết quả và đối soát</th><th>Thao tác</th></tr></thead><tbody>
+    @foreach(var row in Model.Items)
+    {
+        var line=row.Dong;
+        <tr><td><strong>@(line.CTKK_MaTaiSanSnapshot??line.CTKK_MaPhatHien??line.TaiSan?.TS_MaTaiSan)</strong><br />@(line.CTKK_TenTaiSanSnapshot??line.CTKK_TenThucTe??line.TaiSan?.TS_TenTaiSan)<br /><span class="badge bg-secondary">@KiemKeUi.Label(line.CTKK_LoaiDong)</span></td>
+        <td>@if(doc.KK_LaDuLieuCu){<span>Không có snapshot lịch sử</span>}else{<span>PB: @(line.CTKK_PhongBanDuKienSnapshot??"Chưa xác định")<br />Người giữ: @(line.CTKK_NguoiNhanDuKienSnapshot??"Chưa có căn cứ")<br />Vị trí: @(line.CTKK_ViTriDuKien??"Chưa ghi nhận")<br />@line.CTKK_TinhTrangDuKien / @line.CTKK_TrangThaiDuKien<br />Serial: @line.CTKK_SerialDuKien<br />Danh mục: @line.CTKK_DanhMucSnapshot<br />Nguyên giá: @line.CTKK_NguyenGiaDuKien?.ToString("N0")</span>}</td>
+        <td>@if(!doc.KK_LaDuLieuCu){<strong>@(line.CTKK_DaTimThay==null?"Chưa xác nhận có/không":line.CTKK_DaTimThay==true?"Đã tìm thấy":"Không tìm thấy")</strong><br />}@line.CTKK_TinhTrangThucTe<br />@line.CTKK_ViTriThucTe<br />PB: @(line.PhongBanThucTe?.PB_TenPhongBan??line.CTKK_PBThucTeID?.ToString())<br />Người dùng: @line.CTKK_NguoiSuDungThucTe<br />Mã / serial: @line.CTKK_MaNhanDienThucTe / @line.CTKK_SerialThucTe</td>
+        <td><span class="badge bg-@(row.ChenhLech?"warning text-dark":"success")">@KiemKeUi.Label(line.CTKK_KetQua)</span>
+            @if(!doc.KK_LaDuLieuCu){<div>@KiemKeUi.Label(line.CTKK_TrangThaiDoiSoat)<br />@line.NguoiDoiSoat?.TK_HoTen</div>}
+            <details class="mt-2"><summary>Thông tin chi tiết</summary><dl>
+                <dt>Ghi chú / bằng chứng</dt><dd style="white-space:pre-wrap">@line.CTKK_GhiChu<br />@line.CTKK_BangChung</dd>
+                <dt>Các cờ sai lệch</dt><dd>@(line.CTKK_CoSaiPhongBan?"Sai phòng ban; ":"") @(line.CTKK_CoSaiViTri?"Sai vị trí; ":"") @(line.CTKK_CoSaiNguoiSuDung?"Sai người dùng; ":"") @(line.CTKK_CoHuHong?"Hỏng; ":"") @(line.CTKK_ThieuPhuKien?"Thiếu phụ kiện":"")</dd>
+                <dt>Nguyên nhân / đề xuất</dt><dd>@line.CTKK_LyDoChenhLech<br />@KiemKeUi.Label(line.CTKK_HuongXuLy)<br />@line.CTKK_DeXuatXuLy</dd>
+                <dt>Ghi nhận thực tế (giờ Việt Nam)</dt><dd>#@line.CTKK_NguoiGhiNhanID · @line.CTKK_ThoiDiemGhiNhanUTC?.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss")</dd>
+                <dt>Tiến độ xử lý hậu kiểm</dt><dd>@KiemKeUi.Label(line.CTKK_TrangThaiXuLy)<br />@line.CTKK_KetQuaXuLy<br />@line.CTKK_ThamChieuXuLy</dd>
+                @if(!doc.KK_LaDuLieuCu && row.HienTai!=null){<dt>Sổ hiện tại @(row.BienDong?"— đã biến động":"")</dt><dd>@row.HienTai.Ma · @row.HienTai.Serial · @row.HienTai.TinhTrang / @row.HienTai.TrangThai<br />@row.HienTai.PhongBan · @row.HienTai.NguoiNhan · @row.HienTai.ViTri<br />@row.HienTai.CanhBao</dd>}
+                @if(line.CTKK_CanhBaoNguon!=null){<dt>Cảnh báo khi chốt</dt><dd>@line.CTKK_CanhBaoNguon</dd>}
+            </dl></details>
+            @if(row.BienDong && !doc.KK_LaDuLieuCu){<span class="badge bg-danger">Sổ hiện tại đã biến động</span>}
+        </td>
+        <td>
+            @if(Model.CanRecord)
+            {<div class="d-grid gap-2"><a asp-action="GhiNhan" asp-route-id="@line.CTKK_ID" class="btn btn-outline-primary btn-sm">Ghi nhận thực tế</a><a asp-action="DoiSoat" asp-route-id="@line.CTKK_ID" class="btn btn-outline-warning btn-sm">Đối soát / giải trình</a></div>
+            @if(line.CTKK_KetQua=="CanXacMinh" || line.CTKK_TrangThaiDoiSoat=="CanKiemKeLai")
+            {<details class="mt-2"><summary>Kiểm kê lại</summary><form method="post" asp-action="KiemKeLai" asp-route-id="@line.CTKK_ID" data-confirm="Bắt đầu lượt kiểm kê lại cho dòng này? Lịch sử cũ được giữ trong nhật ký."><input name="RequestKey" type="hidden" value="@Guid.NewGuid()" /><input name="PhienBan" type="hidden" value="@line.CTKK_PhienBan" /><label>Lý do<textarea name="LyDo" class="form-control" maxlength="4000" required></textarea></label><button class="btn btn-warning btn-sm">Yêu cầu kiểm kê lại</button></form></details>}}
+            @if(!doc.KK_LaDuLieuCu && doc.KK_TrangThai=="HoanThanh" && Model.CanManage && row.ChenhLech){<a asp-action="CapNhatXuLy" asp-route-id="@line.CTKK_ID" class="btn btn-outline-primary btn-sm">Cập nhật xử lý hậu kiểm</a>}
+        </td></tr>
+    }
+    @if(Model.Items.Count==0){<tr><td colspan="5">Chưa có dòng phù hợp. Đợt nháp chỉ có danh sách sau khi bắt đầu.</td></tr>}
+    </tbody></table></div>
+    <nav aria-label="Phân trang dòng"><ul class="pagination">@for(var p=Math.Max(1,Model.Page-2);p<=Math.Min(Model.Pages,Model.Page+2);p++){<li class="page-item @(p==Model.Page?"active":"")"><a class="page-link" asp-action="DanhSachKiemKe" asp-route-id="@doc.KK_ID" asp-route-keyword="@Model.Keyword" asp-route-ketQua="@Model.KetQua" asp-route-page="@p">@p</a></li>}</ul></nav>
+</div></div>
+@if(Model.Events.Count>0){<div class="card"><div class="card-body pt-3"><h2 class="h5">Nhật ký gần nhất</h2><ul>@foreach(var evt in Model.Events){<li>@evt.SKK_ThoiDiemUTC.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss") · @evt.SKK_NguoiThucHienSnapshot · @KiemKeUi.Label(evt.SKK_HanhDong) · @evt.SKK_LyDo</li>}</ul></div></div>}
+</main>

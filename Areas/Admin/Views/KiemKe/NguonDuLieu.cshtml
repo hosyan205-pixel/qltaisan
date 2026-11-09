@@ -1,0 +1,10 @@
+@model List<KiemKeSach>
+@{ ViewData["Title"] = "Nguồn dữ liệu kiểm kê cần kiểm tra"; }
+<main id="main" class="main">
+<h1 class="h4">@ViewData["Title"]</h1><partial name="_DieuHuong" />
+<p class="alert alert-warning">Các tài sản chưa xác định đơn vị, đang bảo trì hoặc có xung đột được liệt kê để đối chiếu. Việc xem danh sách này không sửa tài sản hay bàn giao. Tài sản chưa xác định phòng ban vẫn thuộc phạm vi toàn bộ nếu còn quản lý và chưa thanh lý thực tế.</p>
+<div class="card"><div class="card-body pt-3"><div class="table-responsive"><table class="table"><thead><tr><th>Tài sản</th><th>Phòng ban theo nguồn</th><th>Người giữ theo nguồn</th><th>Trạng thái hiện tại</th><th>Cần kiểm tra</th></tr></thead><tbody>
+@foreach(var item in Model){<tr><td><strong>@item.Ma</strong><br />@item.Ten</td><td>@(item.PhongBan??"Chưa xác định")</td><td>@(item.NguoiNhan??"Chưa có căn cứ")</td><td>@item.TrangThai<br />@item.TinhTrang</td><td>@item.CanhBao @if(item.DangBaoTri){<span class="badge bg-warning text-dark">Cần bằng chứng bảo trì</span>} @if(item.XungDot){<span class="badge bg-danger">Xung đột nguồn</span>}</td></tr>}
+@if(Model.Count==0){<tr><td colspan="5">Không phát hiện trường hợp cần kiểm tra từ nguồn hiện tại.</td></tr>}
+</tbody></table></div></div></div>
+</main>

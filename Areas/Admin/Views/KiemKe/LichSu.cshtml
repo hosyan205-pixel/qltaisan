@@ -1,0 +1,13 @@
+@model KiemKeLichSu
+@{ ViewData["Title"]="Nhật ký kiểm kê "+Model.Phieu.KK_MaPhieu; }
+<main id="main" class="main">
+<h1 class="h4">@ViewData["Title"]</h1><partial name="_DieuHuong" />
+<p><a asp-action="Details" asp-route-id="@Model.Phieu.KK_ID">Quay lại chi tiết đợt</a> · @Model.Total sự kiện</p>
+@if(Model.Phieu.KK_LaDuLieuCu){<p class="alert alert-warning">Phiếu lịch sử không có nhật ký được ghi trước nâng cấp. Hệ thống không tạo giả các sự kiện trước đây.</p>}
+@foreach(var evt in Model.Items)
+{
+    <article class="card"><div class="card-body pt-3"><h2 class="h6">@evt.SKK_ThoiDiemUTC.AddHours(7).ToString("dd/MM/yyyy HH:mm:ss") (giờ Việt Nam) · @evt.SKK_NguoiThucHienSnapshot (#@evt.SKK_NguoiThucHienID) · @KiemKeUi.Label(evt.SKK_HanhDong)</h2><p>Dòng: @evt.CTKK_ID · Lý do: @evt.SKK_LyDo<br />Mã yêu cầu: <code>@evt.SKK_RequestKey</code></p><details><summary>Dữ liệu trước / sau</summary><h3 class="h6 mt-2">Trước</h3><pre class="border rounded p-2" style="white-space:pre-wrap;overflow-wrap:anywhere">@(evt.SKK_Truoc??"Chưa tồn tại")</pre><h3 class="h6">Sau</h3><pre class="border rounded p-2" style="white-space:pre-wrap;overflow-wrap:anywhere">@evt.SKK_Sau</pre></details></div></article>
+}
+@if(Model.Items.Count==0){<div class="alert alert-secondary">Chưa có sự kiện.</div>}
+<nav aria-label="Phân trang nhật ký"><ul class="pagination">@for(var p=Math.Max(1,Model.Page-2);p<=Math.Min(Model.Pages,Model.Page+2);p++){<li class="page-item @(p==Model.Page?"active":"")"><a class="page-link" asp-action="LichSu" asp-route-id="@Model.Phieu.KK_ID" asp-route-page="@p">@p</a></li>}</ul></nav>
+</main>

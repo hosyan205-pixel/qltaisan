@@ -9,12 +9,20 @@
         string.Equals(MenuArea(item), ViewContext.RouteData.Values["area"]?.ToString(), StringComparison.OrdinalIgnoreCase);
 }
 
-@if(Context.Items["GiaoNhanCanManage"] is false)
+@if(Context.Items["KiemKeRestricted"] is true)
+{
+    <aside id="sidebar" class="sidebar"><ul class="sidebar-nav" id="sidebar-nav">
+        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-grid"></i><span>Cổng nhân viên</span></a></li>
+        <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="KiemKe" asp-action="Index"><i class="bi bi-clipboard-check"></i><span>Kiểm kê tài sản</span></a></li>
+    </ul></aside>
+}
+else if(Context.Items["GiaoNhanCanManage"] is false)
 {
     <aside id="sidebar" class="sidebar"><ul class="sidebar-nav" id="sidebar-nav">
         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-grid"></i><span>Trang chủ</span></a></li>
         <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="CapPhat" asp-action="Index"><i class="bi bi-file-text"></i><span>Phiếu liên quan đến tôi</span></a></li>
         <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="CapPhat" asp-action="ActiveAssignments"><i class="bi bi-box"></i><span>Tài sản đang giữ</span></a></li>
+        <li class="nav-item"><a class="nav-link" asp-area="Admin" asp-controller="KiemKe" asp-action="Index"><i class="bi bi-clipboard-check"></i><span>Đợt kiểm kê được giao</span></a></li>
     </ul></aside>
 }
 else

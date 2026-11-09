@@ -27,6 +27,7 @@
                 </option>
                 <option value="NhanVien" selected="@(ViewBag.VaiTro == "NhanVien")">Nhân viên
                 </option>
+                <option value="QuanLyTaiSan" selected="@(ViewBag.VaiTro == "QuanLyTaiSan")">Quản lý tài sản / kiểm kê</option>
             </select>
 
             <select name="trangThai" class="form-select" style="width: 160px;">
@@ -85,6 +86,10 @@
                                             @if (item.TK_VaiTro == "Admin")
                                             {
                                                 <span class="badge bg-primary">Quản trị viên</span>
+                                            }
+                                            else if (item.TK_VaiTro == "QuanLyTaiSan")
+                                            {
+                                                <span class="badge bg-info text-dark">Quản lý tài sản</span>
                                             }
                                             else
                                             {

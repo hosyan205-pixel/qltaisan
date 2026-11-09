@@ -1,0 +1,20 @@
+@model KiemKeDoiSoatForm
+@{ ViewData["Title"]="Đối soát kết quả kiểm kê"; var line=Model.Dong.Dong; }
+<main id="main" class="main">
+<h1 class="h4">Đối soát — @(line.CTKK_MaTaiSanSnapshot??line.CTKK_MaPhatHien)</h1><partial name="_DieuHuong" />
+<div class="alert alert-info">Kết quả: @KiemKeUi.Label(line.CTKK_KetQua). Hướng xử lý là đề xuất; người có quyền xử lý hồ sơ tài sản, bàn giao, bảo trì hoặc thanh lý tại phân hệ tương ứng.</div>
+@if(Model.Dong.BienDong || Model.Dong.HienTai?.XungDot==true){<div class="alert alert-warning">Sổ có biến động hoặc nguồn xung đột. @Model.Dong.HienTai?.CanhBao Cần kiểm tra căn cứ và ghi nhận bổ sung trước khi xác nhận đối soát.</div>}
+<div class="card"><div class="card-body pt-3">
+<dl><dt>Sổ đã chốt</dt><dd>@line.CTKK_PhongBanDuKienSnapshot · @line.CTKK_NguoiNhanDuKienSnapshot · @line.CTKK_ViTriDuKien · @line.CTKK_TinhTrangDuKien</dd><dt>Thực tế / bằng chứng</dt><dd>@line.CTKK_NguoiSuDungThucTe · @line.CTKK_ViTriThucTe · @line.CTKK_TinhTrangThucTe<br />@line.CTKK_GhiChu<br />@line.CTKK_BangChung</dd></dl>
+<form asp-action="DoiSoat" asp-route-id="@line.CTKK_ID" method="post">
+    <input asp-for="RequestKey" type="hidden" /><input asp-for="PhienBan" type="hidden" />
+    @if(!ViewData.ModelState.IsValid){<div asp-validation-summary="All" class="alert alert-danger"></div>}
+    <div class="mb-3"><label asp-for="NguyenNhan" class="form-label">Nguyên nhân chênh lệch / căn cứ xác minh độc lập</label><textarea asp-for="NguyenNhan" required maxlength="4000" class="form-control" rows="3"></textarea></div>
+    <div class="mb-3"><label asp-for="HuongXuLy" class="form-label">Hướng xử lý đề xuất</label><select asp-for="HuongXuLy" required class="form-select"><option value="">Chọn hướng xử lý</option>@foreach(var direction in KiemKeUi.Directions){<option value="@direction">@KiemKeUi.Label(direction)</option>}</select></div>
+    <div class="mb-3"><label asp-for="DeXuat" class="form-label">Chi tiết đề xuất</label><textarea asp-for="DeXuat" required maxlength="6000" class="form-control" rows="3"></textarea></div>
+    <div class="mb-3"><label asp-for="NguoiDoiSoatId" class="form-label">Phân công người đối soát</label><select asp-for="NguoiDoiSoatId" asp-items="Model.NguoiDoiSoats" class="form-select"><option value="">Chưa phân công</option></select><small>Khi xác nhận đã đối soát, hệ thống ghi người đang xác nhận và thời điểm thực tế.</small></div>
+    <div class="mb-3"><label asp-for="TrangThai" class="form-label">Trạng thái đối soát</label><select asp-for="TrangThai" class="form-select"><option value="ChuaDoiSoat">Lưu giải trình, chưa đối soát</option><option value="CanKiemKeLai">Cần kiểm kê lại</option>@if(ViewData["KiemKeCanManage"] is true){<option value="DaDoiSoat">Xác nhận đã đối soát đủ căn cứ</option>}</select></div>
+    <div class="mb-3"><label asp-for="LyDo" class="form-label">Lý do sửa giải trình đã đối soát (nếu có)</label><textarea asp-for="LyDo" maxlength="4000" class="form-control" rows="2"></textarea></div>
+    <button class="btn btn-primary">Lưu đối soát</button> <a asp-action="Details" asp-route-id="@line.KK_ID" class="btn btn-outline-secondary">Quay lại đợt</a>
+</form></div></div>
+</main>

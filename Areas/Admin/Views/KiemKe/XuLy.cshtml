@@ -1,0 +1,15 @@
+@model KiemKeXuLyForm
+@{ ViewData["Title"]="Cập nhật xử lý chênh lệch"; var line=Model.Dong.Dong; }
+<main id="main" class="main">
+<h1 class="h4">Tiến độ xử lý — @(line.CTKK_MaTaiSanSnapshot??line.CTKK_MaPhatHien)</h1><partial name="_DieuHuong" />
+<div class="alert alert-info">Kết quả đã duyệt @KiemKeUi.Label(line.CTKK_KetQua) được giữ nguyên. Trang này chỉ ghi tiến độ xử lý và tham chiếu đến hồ sơ đã thực hiện tại phân hệ liên quan.</div>
+<div class="card"><div class="card-body pt-3"><form asp-action="CapNhatXuLy" asp-route-id="@line.CTKK_ID" method="post">
+    <input asp-for="RequestKey" type="hidden" /><input asp-for="PhienBan" type="hidden" />
+    @if(!ViewData.ModelState.IsValid){<div asp-validation-summary="All" class="alert alert-danger"></div>}
+    <div class="mb-3"><label asp-for="TrangThai" class="form-label">Tiến độ xử lý</label><select asp-for="TrangThai" class="form-select">@foreach(var state in new[]{"ChuaXuLy","DangXuLy","DaXuLy","KhongCanXuLy"}){<option value="@state">@KiemKeUi.Label(state)</option>}</select></div>
+    <div class="mb-3"><label asp-for="KetQua" class="form-label">Kết quả / giải trình xử lý</label><textarea asp-for="KetQua" required maxlength="4000" class="form-control" rows="4"></textarea></div>
+    <div class="mb-3"><label asp-for="ThamChieu" class="form-label">Mã hồ sơ tham chiếu</label><input asp-for="ThamChieu" maxlength="100" class="form-control" /><small>Đã xử lý phải có hồ sơ thực tế cùng tài sản: CP:mã phiếu bàn giao đã xác nhận; BT:mã bảo trì đã hoàn tất; TL:mã thanh lý đã hoàn tất; TS:mã hồ sơ tài sản đã được cập nhật. Ngoài sổ phải đối chiếu đúng mã/serial hiện vật.</small></div>
+    <div class="mb-3"><label asp-for="LyDo" class="form-label">Lý do cập nhật tiến độ</label><textarea asp-for="LyDo" required maxlength="4000" class="form-control" rows="2"></textarea></div>
+    <button class="btn btn-primary">Lưu tiến độ xử lý</button> <a asp-action="Details" asp-route-id="@line.KK_ID" class="btn btn-outline-secondary">Quay lại đợt</a>
+</form></div></div>
+</main>

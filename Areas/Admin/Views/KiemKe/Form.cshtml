@@ -1,0 +1,22 @@
+@model KiemKePhieuForm
+@{ ViewData["Title"] = Model.Id.HasValue ? "Sửa đợt kiểm kê nháp" : "Lập đợt kiểm kê"; }
+<main id="main" class="main">
+<h1 class="h4">@ViewData["Title"]</h1><partial name="_DieuHuong" />
+<div class="card"><div class="card-body pt-3">
+<form method="post" asp-action="@(Model.Id.HasValue ? "Edit" : "Create")" asp-route-id="@Model.Id">
+    <input asp-for="RequestKey" type="hidden" /><input asp-for="PhienBan" type="hidden" /><input asp-for="DotGocId" type="hidden" />
+    @if(!ViewData.ModelState.IsValid){<div asp-validation-summary="All" class="alert alert-danger"></div>}
+    @if(Model.DotGocId.HasValue){<p class="alert alert-info">Đợt bổ sung cho đợt #@Model.DotGocId. Kết quả đợt gốc được giữ nguyên.</p>}
+    <div class="row g-3">
+        <div class="col-12"><label asp-for="TenDot" class="form-label">Tên đợt kiểm kê</label><input asp-for="TenDot" required maxlength="200" class="form-control" /><span asp-validation-for="TenDot" class="text-danger"></span></div>
+        <div class="col-md-6"><label asp-for="LoaiPhamVi" class="form-label">Loại phạm vi</label><select asp-for="LoaiPhamVi" class="form-select"><option value="PhongBan">Theo phòng ban</option><option value="ToanBo">Toàn bộ tài sản</option></select></div>
+        <div class="col-md-6"><label asp-for="PhongBanId" class="form-label">Phòng ban (để trống khi kiểm kê toàn bộ)</label><select asp-for="PhongBanId" asp-items="Model.PhongBans" class="form-select"><option value="">Chọn phòng ban</option></select></div>
+        <div class="col-md-6"><label asp-for="NgayKiemKe" class="form-label">Ngày dự kiến bắt đầu</label><input asp-for="NgayKiemKe" type="date" required class="form-control" /></div>
+        <div class="col-md-6"><label asp-for="NgayKetThucDuKien" class="form-label">Ngày kết thúc dự kiến</label><input asp-for="NgayKetThucDuKien" type="date" class="form-control" /></div>
+        <div class="col-12"><label asp-for="NguoiKiemKeId" class="form-label">Người trực tiếp kiểm kê</label><select asp-for="NguoiKiemKeId" asp-items="Model.NguoiKiemKes" required class="form-select"><option value="">Chọn tài khoản đang hoạt động</option></select><small>Người được giao kiểm kê không được tự phê duyệt đợt này.</small></div>
+        <div class="col-12"><label asp-for="GhiChu" class="form-label">Ghi chú</label><textarea asp-for="GhiChu" maxlength="4000" class="form-control" rows="3"></textarea></div>
+    </div>
+    <p class="text-muted mt-3">Mã phiếu được sinh khi lưu nháp. Danh sách tài sản chỉ được chốt khi bắt đầu kiểm kê.</p>
+    <button class="btn btn-primary">Lưu nháp</button> <a asp-action="@(Model.Id.HasValue?"Details":"Index")" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Quay lại</a>
+</form></div></div>
+</main>

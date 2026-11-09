@@ -1,0 +1,18 @@
+@model KiemKeTongHop
+<div class="card"><div class="card-body pt-3">
+    <h2 class="h5">Tổng hợp kết quả — tiến độ @Model.TienDo</h2>
+    <div class="row g-2">
+        @foreach (var item in new Dictionary<string, int> {
+            ["Dự kiến trong sổ"] = Model.DuKien, ["Đã tìm thấy trong sổ"] = Model.DaTimThay,
+            ["Không tìm thấy"] = Model.KhongTimThay, ["Chưa kiểm trong sổ"] = Model.ChuaKiem,
+            ["Khớp"] = Model.Khop, ["Thừa ngoài sổ"] = Model.Thua, ["Ngoài phạm vi"] = Model.NgoaiPhamVi,
+            ["Cần xác minh"] = Model.CanXacMinh, ["Dòng có chênh lệch"] = Model.DongChenhLech,
+            ["Sai phòng ban"] = Model.SaiPhongBan, ["Sai vị trí"] = Model.SaiViTri, ["Sai người sử dụng"] = Model.SaiNguoiDung,
+            ["Hỏng"] = Model.Hong, ["Thiếu phụ kiện"] = Model.ThieuPhuKien, ["Nhiều sai lệch"] = Model.NhieuSaiLech,
+            ["Chưa đối soát"] = Model.ChuaDoiSoat, ["Đã xử lý hậu kiểm"] = Model.DaXuLy })
+        {
+            <div class="col-6 col-md-4 col-xl-3"><div class="border rounded p-2"><strong>@item.Value</strong> @item.Key</div></div>
+        }
+    </div>
+    <p class="small text-muted mt-2 mb-0">Mỗi tài sản là một dòng trong một đợt; cùng tài sản có thể xuất hiện ở nhiều đợt. Một dòng có thể có nhiều cờ sai lệch; tổng @Model.TongCo cờ không phải số tài sản chênh lệch. Chỉ dòng trong sổ đã xác nhận có/không tìm thấy được tính vào tiến độ.</p>
+</div></div>

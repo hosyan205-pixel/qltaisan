@@ -69,7 +69,7 @@ namespace DoAn.Areas.Admin.Controllers
         {
             await Departments(tk.PB_ID);
             if(tk.PB_ID.HasValue&&!await _context.tblPhongBan.AnyAsync(x=>x.PB_ID==tk.PB_ID&&x.PB_TrangThai==true))ModelState.AddModelError(nameof(tk.PB_ID),"Chọn phòng ban đang hoạt động.");
-            if(tk.TK_VaiTro is not ("Admin" or "NhanVien"))ModelState.AddModelError(nameof(tk.TK_VaiTro),"Vai trò không hợp lệ.");
+            if(tk.TK_VaiTro is not ("Admin" or "NhanVien" or "QuanLyTaiSan"))ModelState.AddModelError(nameof(tk.TK_VaiTro),"Vai trò không hợp lệ.");
             if (!ModelState.IsValid)
             {
                 return View(tk);
@@ -130,7 +130,7 @@ namespace DoAn.Areas.Admin.Controllers
 
             await Departments(tk.PB_ID??existing.PB_ID);
             if(tk.PB_ID!=existing.PB_ID&&tk.PB_ID.HasValue&&!await _context.tblPhongBan.AnyAsync(x=>x.PB_ID==tk.PB_ID&&x.PB_TrangThai==true))ModelState.AddModelError(nameof(tk.PB_ID),"Chọn phòng ban đang hoạt động.");
-            if(tk.TK_VaiTro is not ("Admin" or "NhanVien"))ModelState.AddModelError(nameof(tk.TK_VaiTro),"Vai trò không hợp lệ.");
+            if(tk.TK_VaiTro is not ("Admin" or "NhanVien" or "QuanLyTaiSan"))ModelState.AddModelError(nameof(tk.TK_VaiTro),"Vai trò không hợp lệ.");
 
             bool usernameExists = await _context.tblTaiKhoan
                 .AnyAsync(x => x.TK_TenDangNhap == tk.TK_TenDangNhap && x.TK_ID != id);

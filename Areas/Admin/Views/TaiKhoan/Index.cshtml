@@ -114,10 +114,14 @@
                                                 <i class="bi bi-pencil"></i>
                                             </a>
 
-                                            <a asp-area="Admin" asp-controller="TaiKhoan" asp-action="Delete"
-                                               asp-route-id="@item.TK_ID" class="btn btn-danger btn-sm" title="Xóa tài khoản">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
+                                            <form asp-area="Admin" asp-controller="TaiKhoan" asp-action="Delete"
+                                                  asp-route-id="@item.TK_ID" method="post" class="d-inline"
+                                                  onsubmit="return confirm('Bạn có chắc chắn muốn xóa tài khoản này?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-danger btn-sm" title="Xóa tài khoản">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 }

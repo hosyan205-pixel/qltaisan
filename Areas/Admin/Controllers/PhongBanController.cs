@@ -1,4 +1,5 @@
 using DoAn.Models;
+using MySqlConnector;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +26,7 @@ public class PhongBanController(DataContext context) : Controller
         if (!string.IsNullOrWhiteSpace(keyword))
         {
             var kw = keyword.Trim().ToLower();
-            query = query.Where(x => x.PB_MaPhongBan.ToLower().Contains(kw) || 
+            query = query.Where(x => x.PB_MaPhongBan.ToLower().Contains(kw) ||
                 x.PB_TenPhongBan.ToLower().Contains(kw) ||
                 (x.PB_NguoiPhuTrach != null && x.PB_NguoiPhuTrach.ToLower().Contains(kw)));
         }
@@ -136,12 +137,20 @@ public class PhongBanController(DataContext context) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Delete(int id)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete([FromRoute] int id)
     {
         var item = await context.tblPhongBan.FindAsync(id);
         if (item == null)
         {
             return NotFound();
+        }
+
+        var hasTaiKhoan = await context.tblTaiKhoan.AnyAsync(x => x.PB_ID == id);
+        if (hasTaiKhoan)
+        {
+            TempData["Error"] = "Không thể xóa phòng ban này vì đang có tài khoản thuộc phòng ban.";
+            return RedirectToAction(nameof(Index));
         }
 
         var hasCapPhat = await context.tblCapPhatTaiSan.AnyAsync(x => x.PB_ID == id);
@@ -153,8 +162,32 @@ public class PhongBanController(DataContext context) : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        context.tblPhongBan.Remove(item);
-        await context.SaveChangesAsync();
+        try
+        {
+            context.tblPhongBan.Remove(item);
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            context.ChangeTracker.Clear();
+            TempData["Error"] = "Phòng ban đã được xử lý bởi người khác. Vui lòng tải lại danh sách.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (DbUpdateException ex)
+        {
+            context.ChangeTracker.Clear();
+            var sql = ex.GetBaseException() as MySqlException;
+            TempData["Error"] = sql?.Number switch
+            {
+                1451 => "Không thể xóa phòng ban vì còn dữ liệu liên quan. Có thể chuyển sang ngừng hoạt động để giữ lịch sử.",
+                1644 => !string.IsNullOrWhiteSpace(sql.Message)
+                    ? sql.Message
+                    : "Không thể xóa phòng ban do ràng buộc dữ liệu. Vui lòng kiểm tra các dữ liệu liên quan.",
+                1205 or 1213 => "Dữ liệu đang được xử lý đồng thời. Chưa xóa phòng ban; hãy tải lại và thử lại.",
+                _ => "Không thể xóa phòng ban lúc này. Vui lòng thử lại sau."
+            };
+            return RedirectToAction(nameof(Index));
+        }
 
         TempData["Success"] = "Xóa phòng ban thành công.";
         return RedirectToAction(nameof(Index));

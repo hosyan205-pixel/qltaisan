@@ -1,647 +1,370 @@
-  <main id="main" class="main">
-
-    <div class="pagetitle">
-      <h1>Trang chủ</h1>
-      <nav>
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-          <li class="breadcrumb-item active">Dashboard</li>
-        </ol>
-      </nav>
-    </div><!-- End Page Title -->
-
-    <section class="section dashboard">
-      <div class="row">
-
-        <!-- Left side columns -->
-        <div class="col-lg-8">
-          <div class="row">
-
-            <!-- Sales Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card sales-card">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Sales <span>| Today</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-cart"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>145</h6>
-                      <span class="text-success small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div><!-- End Sales Card -->
-
-            <!-- Revenue Card -->
-            <div class="col-xxl-4 col-md-6">
-              <div class="card info-card revenue-card">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Revenue <span>| This Month</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-currency-dollar"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>$3,264</h6>
-                      <span class="text-success small pt-1 fw-bold">8%</span> <span class="text-muted small pt-2 ps-1">increase</span>
-
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div><!-- End Revenue Card -->
-
-            <!-- Customers Card -->
-            <div class="col-xxl-4 col-xl-12">
-
-              <div class="card info-card customers-card">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Customers <span>| This Year</span></h5>
-
-                  <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                      <i class="bi bi-people"></i>
-                    </div>
-                    <div class="ps-3">
-                      <h6>1244</h6>
-                      <span class="text-danger small pt-1 fw-bold">12%</span> <span class="text-muted small pt-2 ps-1">decrease</span>
-
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-
-            </div><!-- End Customers Card -->
-
-            <!-- Reports -->
-            <div class="col-12">
-              <div class="card">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Reports <span>/Today</span></h5>
-
-                  <!-- Line Chart -->
-                  <div id="reportsChart"></div>
-
-                  <script>
-                    document.addEventListener("DOMContentLoaded", () => {
-                      new ApexCharts(document.querySelector("#reportsChart"), {
-                        series: [{
-                          name: 'Sales',
-                          data: [31, 40, 28, 51, 42, 82, 56],
-                        }, {
-                          name: 'Revenue',
-                          data: [11, 32, 45, 32, 34, 52, 41]
-                        }, {
-                          name: 'Customers',
-                          data: [15, 11, 32, 18, 9, 24, 11]
-                        }],
-                        chart: {
-                          height: 350,
-                          type: 'area',
-                          toolbar: {
-                            show: false
-                          },
-                        },
-                        markers: {
-                          size: 4
-                        },
-                        colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                        fill: {
-                          type: "gradient",
-                          gradient: {
-                            shadeIntensity: 1,
-                            opacityFrom: 0.3,
-                            opacityTo: 0.4,
-                            stops: [0, 90, 100]
-                          }
-                        },
-                        dataLabels: {
-                          enabled: false
-                        },
-                        stroke: {
-                          curve: 'smooth',
-                          width: 2
-                        },
-                        xaxis: {
-                          type: 'datetime',
-                          categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-                        },
-                        tooltip: {
-                          x: {
-                            format: 'dd/MM/yy HH:mm'
-                          },
-                        }
-                      }).render();
-                    });
-                  </script>
-                  <!-- End Line Chart -->
-
-                </div>
-
-              </div>
-            </div><!-- End Reports -->
-
-            <!-- Recent Sales -->
-            <div class="col-12">
-              <div class="card recent-sales overflow-auto">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body">
-                  <h5 class="card-title">Recent Sales <span>| Today</span></h5>
-
-                  <table class="table table-borderless datatable">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="#">#2457</a></th>
-                        <td>Brandon Jacob</td>
-                        <td><a href="#" class="text-primary">At praesentium minu</a></td>
-                        <td>$64</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2147</a></th>
-                        <td>Bridie Kessler</td>
-                        <td><a href="#" class="text-primary">Blanditiis dolor omnis similique</a></td>
-                        <td>$47</td>
-                        <td><span class="badge bg-warning">Pending</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2049</a></th>
-                        <td>Ashleigh Langosh</td>
-                        <td><a href="#" class="text-primary">At recusandae consectetur</a></td>
-                        <td>$147</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Angus Grady</td>
-                        <td><a href="#" class="text-primar">Ut voluptatem id earum et</a></td>
-                        <td>$67</td>
-                        <td><span class="badge bg-danger">Rejected</span></td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#">#2644</a></th>
-                        <td>Raheem Lehner</td>
-                        <td><a href="#" class="text-primary">Sunt similique distinctio</a></td>
-                        <td>$165</td>
-                        <td><span class="badge bg-success">Approved</span></td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                </div>
-
-              </div>
-            </div><!-- End Recent Sales -->
-
-            <!-- Top Selling -->
-            <div class="col-12">
-              <div class="card top-selling overflow-auto">
-
-                <div class="filter">
-                  <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                  <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                    <li class="dropdown-header text-start">
-                      <h6>Filter</h6>
-                    </li>
-
-                    <li><a class="dropdown-item" href="#">Today</a></li>
-                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                  </ul>
-                </div>
-
-                <div class="card-body pb-0">
-                  <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                  <table class="table table-borderless">
-                    <thead>
-                      <tr>
-                        <th scope="col">Preview</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Sold</th>
-                        <th scope="col">Revenue</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="~/admin/assets/img/product-1.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa voluptas nulla</a></td>
-                        <td>$64</td>
-                        <td class="fw-bold">124</td>
-                        <td>$5,828</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="~/admin/assets/img/product-2.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Exercitationem similique doloremque</a></td>
-                        <td>$46</td>
-                        <td class="fw-bold">98</td>
-                        <td>$4,508</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="~/admin/assets/img/product-3.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Doloribus nisi exercitationem</a></td>
-                        <td>$59</td>
-                        <td class="fw-bold">74</td>
-                        <td>$4,366</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="~/admin/assets/img/product-4.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Officiis quaerat sint rerum error</a></td>
-                        <td>$32</td>
-                        <td class="fw-bold">63</td>
-                        <td>$2,016</td>
-                      </tr>
-                      <tr>
-                        <th scope="row"><a href="#"><img src="~/admin/assets/img/product-5.jpg" alt=""></a></th>
-                        <td><a href="#" class="text-primary fw-bold">Sit unde debitis delectus repellendus</a></td>
-                        <td>$79</td>
-                        <td class="fw-bold">41</td>
-                        <td>$3,239</td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                </div>
-
-              </div>
-            </div><!-- End Top Selling -->
-
-          </div>
-        </div><!-- End Left side columns -->
-
-        <!-- Right side columns -->
-        <div class="col-lg-4">
-
-          <!-- Recent Activity -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-
-            <div class="card-body">
-              <h5 class="card-title">Recent Activity <span>| Today</span></h5>
-
-              <div class="activity">
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">32 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                  <div class="activity-content">
-                    Quia quae rerum <a href="#" class="fw-bold text-dark">explicabo officiis</a> beatae
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">56 min</div>
-                  <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
-                  <div class="activity-content">
-                    Voluptatem blanditiis blanditiis eveniet
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">2 hrs</div>
-                  <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
-                  <div class="activity-content">
-                    Voluptates corrupti molestias voluptatem
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">1 day</div>
-                  <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
-                  <div class="activity-content">
-                    Tempore autem saepe <a href="#" class="fw-bold text-dark">occaecati voluptatem</a> tempore
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">2 days</div>
-                  <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                  <div class="activity-content">
-                    Est sit eum reiciendis exercitationem
-                  </div>
-                </div><!-- End activity item-->
-
-                <div class="activity-item d-flex">
-                  <div class="activite-label">4 weeks</div>
-                  <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                  <div class="activity-content">
-                    Dicta dolorem harum nulla eius. Ut quidem quidem sit quas
-                  </div>
-                </div><!-- End activity item-->
-
-              </div>
-
-            </div>
-          </div><!-- End Recent Activity -->
-
-          <!-- Budget Report -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-
-            <div class="card-body pb-0">
-              <h5 class="card-title">Budget Report <span>| This Month</span></h5>
-
-              <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
-                    legend: {
-                      data: ['Allocated Budget', 'Actual Spending']
-                    },
-                    radar: {
-                      // shape: 'circle',
-                      indicator: [{
-                          name: 'Sales',
-                          max: 6500
-                        },
-                        {
-                          name: 'Administration',
-                          max: 16000
-                        },
-                        {
-                          name: 'Information Technology',
-                          max: 30000
-                        },
-                        {
-                          name: 'Customer Support',
-                          max: 38000
-                        },
-                        {
-                          name: 'Development',
-                          max: 52000
-                        },
-                        {
-                          name: 'Marketing',
-                          max: 25000
-                        }
-                      ]
-                    },
-                    series: [{
-                      name: 'Budget vs spending',
-                      type: 'radar',
-                      data: [{
-                          value: [4200, 3000, 20000, 35000, 50000, 18000],
-                          name: 'Allocated Budget'
-                        },
-                        {
-                          value: [5000, 14000, 28000, 26000, 42000, 21000],
-                          name: 'Actual Spending'
-                        }
-                      ]
-                    }]
-                  });
-                });
-              </script>
-
-            </div>
-          </div><!-- End Budget Report -->
-
-          <!-- Website Traffic -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-
-            <div class="card-body pb-0">
-              <h5 class="card-title">Website Traffic <span>| Today</span></h5>
-
-              <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-
-              <script>
-                document.addEventListener("DOMContentLoaded", () => {
-                  echarts.init(document.querySelector("#trafficChart")).setOption({
-                    tooltip: {
-                      trigger: 'item'
-                    },
-                    legend: {
-                      top: '5%',
-                      left: 'center'
-                    },
-                    series: [{
-                      name: 'Access From',
-                      type: 'pie',
-                      radius: ['40%', '70%'],
-                      avoidLabelOverlap: false,
-                      label: {
-                        show: false,
-                        position: 'center'
-                      },
-                      emphasis: {
-                        label: {
-                          show: true,
-                          fontSize: '18',
-                          fontWeight: 'bold'
-                        }
-                      },
-                      labelLine: {
-                        show: false
-                      },
-                      data: [{
-                          value: 1048,
-                          name: 'Search Engine'
-                        },
-                        {
-                          value: 735,
-                          name: 'Direct'
-                        },
-                        {
-                          value: 580,
-                          name: 'Email'
-                        },
-                        {
-                          value: 484,
-                          name: 'Union Ads'
-                        },
-                        {
-                          value: 300,
-                          name: 'Video Ads'
-                        }
-                      ]
-                    }]
-                  });
-                });
-              </script>
-
-            </div>
-          </div><!-- End Website Traffic -->
-
-          <!-- News & Updates Traffic -->
-          <div class="card">
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Filter</h6>
-                </li>
-
-                <li><a class="dropdown-item" href="#">Today</a></li>
-                <li><a class="dropdown-item" href="#">This Month</a></li>
-                <li><a class="dropdown-item" href="#">This Year</a></li>
-              </ul>
-            </div>
-
-            <div class="card-body pb-0">
-              <h5 class="card-title">News &amp; Updates <span>| Today</span></h5>
-
-              <div class="news">
-                <div class="post-item clearfix">
-                  <img src="~/admin/assets/img/news-1.jpg" alt="">
-                  <h4><a href="#">Nihil blanditiis at in nihil autem</a></h4>
-                  <p>Sit recusandae non aspernatur laboriosam. Quia enim eligendi sed ut harum...</p>
-                </div>
-
-                <div class="post-item clearfix">
-                  <img src="~/admin/assets/img/news-2.jpg" alt="">
-                  <h4><a href="#">Quidem autem et impedit</a></h4>
-                  <p>Illo nemo neque maiores vitae officiis cum eum turos elan dries werona nande...</p>
-                </div>
-
-                <div class="post-item clearfix">
-                  <img src="~/admin/assets/img/news-3.jpg" alt="">
-                  <h4><a href="#">Id quia et et ut maxime similique occaecati ut</a></h4>
-                  <p>Fugiat voluptas vero eaque accusantium eos. Consequuntur sed ipsam et totam...</p>
-                </div>
-
-                <div class="post-item clearfix">
-                  <img src="~/admin/assets/img/news-4.jpg" alt="">
-                  <h4><a href="#">Laborum corporis quo dara net para</a></h4>
-                  <p>Qui enim quia optio. Eligendi aut asperiores enim repellendusvel rerum cuder...</p>
-                </div>
-
-                <div class="post-item clearfix">
-                  <img src="~/admin/assets/img/news-5.jpg" alt="">
-                  <h4><a href="#">Et dolores corrupti quae illo quod dolor</a></h4>
-                  <p>Odit ut eveniet modi reiciendis. Atque cupiditate libero beatae dignissimos eius...</p>
-                </div>
-
-              </div><!-- End sidebar recent posts-->
-
-            </div>
-          </div><!-- End News & Updates -->
-
-        </div><!-- End Right side columns -->
-
+@using DoAn.Areas.Admin.Models
+@using System.Text.Json
+@model Tblthongke
+@{
+  Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+  ViewData["Title"] = "Thống kê tài sản";
+  var tongTrongPhongBan = Model.TaiSanTheoPhongBans.Sum(x => x.SoLuong);
+}
+
+<main id="main" class="main">
+  <nav class="mb-2">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+      <li class="breadcrumb-item active">Thống kê</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-3">
+    <div>
+      <h3 class="fw-bold mb-1" style="color:#012970;">Thống kê tài sản</h3>
+    </div>
+    <a asp-area="Admin" asp-controller="Home" asp-action="ExportBaoCao" asp-route-preset="@Model.FilterPreset"
+       asp-route-tuNgay="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+       asp-route-denNgay="@(Model.DenNgay?.ToString("yyyy-MM-dd"))" asp-route-phongBanId="@Model.PhongBanId"
+       class="btn btn-primary px-3 py-2 rounded-3 fw-semibold shadow-sm">
+      <i class="bi bi-download me-2"></i>Xuất báo cáo
+    </a>
+  </div>
+
+  <div class="stat-filter-bar mb-4">
+    <form method="get" asp-area="Admin" asp-controller="Home" asp-action="Index" id="statFilterForm"
+          class="d-flex flex-wrap flex-xl-nowrap align-items-end justify-content-between gap-2">
+      <input type="hidden" name="preset" id="presetField" value="@Model.FilterPreset" />
+
+      <div class="stat-preset-group flex-shrink-0">
+        <button type="button" onclick="selectPreset('all')"
+                class="stat-preset-btn @(Model.FilterPreset == "all" ? "active" : "")">Tất cả</button>
+        <button type="button" onclick="selectPreset('7days')"
+                class="stat-preset-btn @(Model.FilterPreset == "7days" ? "active" : "")">7 ngày</button>
+        <button type="button" onclick="selectPreset('30days')"
+                class="stat-preset-btn @(Model.FilterPreset == "30days" ? "active" : "")">30 ngày</button>
+        <button type="button" onclick="selectPreset('quarter')"
+                class="stat-preset-btn @(Model.FilterPreset == "quarter" ? "active" : "")">Quý này</button>
+        <button type="button" onclick="selectPreset('year')"
+                class="stat-preset-btn @(Model.FilterPreset == "year" ? "active" : "")">Năm này</button>
       </div>
-    </section>
 
-  </main><!-- End #main -->
+      <div class="d-flex flex-wrap flex-lg-nowrap align-items-end gap-2">
+        <div>
+          <label class="form-label text-muted mb-1 d-block" style="font-size: 0.72rem;">Từ ngày</label>
+          <input type="date" name="tuNgay" id="tuNgay" value="@(Model.TuNgay?.ToString("yyyy-MM-dd"))"
+                 class="form-control form-control-sm rounded-3" style="width: 132px; height: 36px;"
+                 onchange="markCustom()" />
+        </div>
+        <div>
+          <label class="form-label text-muted mb-1 d-block" style="font-size: 0.72rem;">Đến ngày</label>
+          <input type="date" name="denNgay" id="denNgay" value="@(Model.DenNgay?.ToString("yyyy-MM-dd"))"
+                 class="form-control form-control-sm rounded-3" style="width: 132px; height: 36px;"
+                 onchange="markCustom()" />
+        </div>
+        <div>
+          <label class="form-label text-muted mb-1 d-block" style="font-size: 0.72rem;">Phòng ban</label>
+          <select name="phongBanId" class="form-select form-select-sm rounded-3" style="width: 155px; height: 36px;">
+            <option value="">Tất cả phòng ban</option>
+            @foreach (var pb in Model.DanhSachPhongBan)
+            {
+              <option value="@pb.PB_ID" selected="@(Model.PhongBanId == pb.PB_ID ? "selected" : null)">@pb.PB_TenPhongBan
+              </option>
+            }
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm px-3 rounded-3 fw-semibold text-nowrap flex-shrink-0"
+                style="height: 36px;">
+          <i class="bi bi-search me-1"></i>Lọc dữ liệu
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-kpi-card stat-kpi-blue">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-semibold small">Đang sử dụng</span>
+          <div class="stat-kpi-icon"><i class="bi bi-check-circle"></i></div>
+        </div>
+        <div class="stat-kpi-number">@Model.DangSuDung</div>
+        <div class="stat-kpi-sub">Nguyên giá: @Model.NguyenGiaDangSuDung.ToString("N0") đ</div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-kpi-card stat-kpi-green">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-semibold small">Chưa cấp phát</span>
+          <div class="stat-kpi-icon"><i class="bi bi-box-seam"></i></div>
+        </div>
+        <div class="stat-kpi-number">@Model.ChuaCapPhat</div>
+        <div class="stat-kpi-sub">Sẵn sàng trong kho: @Model.NguyenGiaChuaCapPhat.ToString("N0") đ</div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="stat-kpi-card stat-kpi-white">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="fw-semibold small text-muted">Đang bảo trì</span>
+          <div class="stat-kpi-icon"><i class="bi bi-wrench-adjustable"></i></div>
+        </div>
+        <div class="stat-kpi-number">@Model.DangBaoTri</div>
+        <div class="stat-kpi-sub text-muted">Chi phí BT: <strong
+          class="text-dark">@Model.TongChiPhiBaoTri.ToString("N0") đ</strong></div>
+        </div>
+      </div>
+
+      <div class="col-xl-3 col-md-6">
+        <div class="stat-kpi-card stat-kpi-amber">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-semibold small">Đã thanh lý</span>
+            <div class="stat-kpi-icon"><i class="bi bi-trash3"></i></div>
+          </div>
+          <div class="stat-kpi-number">@Model.DaThanhLy</div>
+          <div class="stat-kpi-sub">Thu hồi thanh lý: @Model.TongGiaTriThanhLy.ToString("N0") đ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-lg-7">
+        <div class="stat-panel">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="stat-panel-title">Biến động tài sản</div>
+              <div class="stat-panel-sub">Xu hướng nhập mới và cấp phát theo tháng</div>
+            </div>
+            <div class="d-flex gap-3 small">
+              <span><span class="stat-dot" style="background:#2563eb;"></span>Nhập mới</span>
+              <span><span class="stat-dot" style="background:#10b981;"></span>Cấp phát</span>
+            </div>
+          </div>
+          <div id="bienDongChart" style="min-height: 240px;"></div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="stat-panel">
+          <div class="stat-panel-title">Tình trạng tài sản</div>
+          <div class="stat-panel-sub">Phân bổ theo trạng thái kỹ thuật hiện tại</div>
+          <div class="row align-items-center mt-2">
+            <div class="col-sm-5">
+              <div id="tinhTrangDonut"></div>
+            </div>
+            <div class="col-sm-7">
+              @foreach (var item in Model.TinhTrangItems)
+              {
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom small">
+                  <div class="d-flex align-items-center">
+                    <span class="stat-dot" style="background:@item.MauHex;"></span>
+                    <span class="text-dark fw-medium">@item.Ten</span>
+                  </div>
+                  <div class="text-end">
+                    <strong class="text-dark me-2">@item.SoLuong</strong>
+                    <span class="text-muted" style="font-size:0.75rem;">@item.PhanTram%</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-lg-5">
+        <div class="stat-panel">
+          <div class="stat-panel-title">Tài sản theo phòng ban</div>
+          <div class="stat-panel-sub">Tỷ lệ phân bổ tài sản đang sử dụng</div>
+          <div class="row align-items-center mt-2">
+            <div class="col-sm-5">
+              <div id="phongBanDonut"></div>
+            </div>
+            <div class="col-sm-7">
+              @foreach (var pb in Model.TaiSanTheoPhongBans)
+              {
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom small">
+                  <div class="d-flex align-items-center text-truncate pe-2">
+                    <span class="stat-dot" style="background:@pb.MauHex;"></span>
+                    <span class="text-dark fw-medium text-truncate">@pb.TenPhongBan</span>
+                  </div>
+                  <div class="text-end flex-shrink-0">
+                    <strong class="text-dark me-2">@pb.SoLuong</strong>
+                    <span class="text-muted" style="font-size:0.75rem;">@pb.PhanTram%</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="stat-panel">
+          <div class="stat-panel-title">Giá trị theo danh mục</div>
+          <div class="stat-panel-sub">Nguyên giá và số lượng tài sản theo từng nhóm</div>
+          <div class="mt-3">
+            @foreach (var dm in Model.GiaTriTheoDanhMucs)
+            {
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1 small">
+                  <span class="fw-semibold text-dark">@dm.TenDanhMuc</span>
+                  <div>
+                    <strong class="text-dark">@dm.TongGiaTri.ToString("N0") đ</strong>
+                    <span class="text-muted ms-2" style="font-size:0.75rem;">(@dm.SoLuong TS)</span>
+                  </div>
+                </div>
+                <div class="stat-progress">
+                  <div class="stat-progress-bar" style="width: @dm.TyLeThanh%; background-color: @dm.MauHex;"></div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-panel">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <div class="stat-panel-title">Hoạt động gần đây</div>
+          <div class="stat-panel-sub mb-0">Dòng thời gian nghiệp vụ tài sản mới nhất</div>
+        </div>
+        <a asp-area="Admin" asp-controller="TaiSan" asp-action="Index"
+           class="small fw-semibold text-primary text-decoration-none">
+          Xem tất cả <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+          <thead class="table-light text-muted text-uppercase" style="font-size:0.73rem;">
+            <tr>
+              <th class="py-3 ps-3">Mã tài sản</th>
+              <th class="py-3">Tên tài sản</th>
+              <th class="py-3">Nghiệp vụ</th>
+              <th class="py-3">Phòng ban</th>
+              <th class="py-3">Thời gian</th>
+              <th class="py-3 text-end pe-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (Model.HoatDongGanDays.Any())
+            {
+              foreach (var hd in Model.HoatDongGanDays)
+              {
+                var badgeCls = hd.NghiepVu switch
+                {
+                  "Cấp phát" => "stat-badge-blue",
+                  "Bảo trì" => "stat-badge-amber",
+                  "Thu hồi" => "stat-badge-purple",
+                  "Kiểm kê" => "stat-badge-green",
+                  "Thanh lý" => "stat-badge-red",
+                  _ => "stat-badge-blue"
+                };
+                <tr>
+                  <td class="ps-3 fw-bold text-primary">@hd.MaTaiSan</td>
+                  <td class="fw-medium text-dark">@hd.TenTaiSan</td>
+                  <td><span class="stat-badge @badgeCls">@hd.NghiepVu</span></td>
+                  <td class="text-muted">@hd.PhongBan</td>
+                  <td class="text-muted">@hd.ThoiGian.ToString("dd/MM/yyyy")</td>
+                  <td class="text-end pe-3">
+                    <a asp-area="Admin" asp-controller="@hd.ControllerName" asp-action="Details" asp-route-id="@hd.RecordId"
+                       class="btn btn-sm btn-light border rounded-2 text-muted" title="Xem chi tiết">
+                      <i class="bi bi-chevron-right"></i>
+                    </a>
+                  </td>
+                </tr>
+              }
+            }
+            else
+            {
+              <tr>
+                <td colspan="6" class="text-center py-4 text-muted">Không có hoạt động nào trong khoảng thời gian đã chọn.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function selectPreset(val) {
+      document.getElementById('presetField').value = val;
+      if (val !== 'custom') {
+        document.getElementById('tuNgay').value = '';
+        document.getElementById('denNgay').value = '';
+      }
+      document.getElementById('statFilterForm').submit();
+    }
+
+    function markCustom() {
+      document.getElementById('presetField').value = 'custom';
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      new ApexCharts(document.querySelector("#bienDongChart"), {
+        series: [
+          { name: 'Nhập mới', data: @Html.Raw(JsonSerializer.Serialize(Model.BienDongNhapMoi)) },
+          { name: 'Cấp phát', data: @Html.Raw(JsonSerializer.Serialize(Model.BienDongCapPhat)) }
+        ],
+        chart: { type: 'line', height: 240, toolbar: { show: false }, zoom: { enabled: false } },
+        stroke: { curve: 'smooth', width: 2.5 },
+        colors: ['#2563eb', '#10b981'],
+        markers: { size: 3.5 },
+        legend: { show: false },
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
+        xaxis: {
+          categories: @Html.Raw(JsonSerializer.Serialize(Model.BienDongLabels)),
+          labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
+        },
+        yaxis: {
+          labels: { style: { colors: '#94a3b8', fontSize: '11px' } }
+        }
+      }).render();
+
+      new ApexCharts(document.querySelector("#tinhTrangDonut"), {
+        series: @Html.Raw(JsonSerializer.Serialize(Model.TinhTrangItems.Select(x => x.SoLuong))),
+        labels: @Html.Raw(JsonSerializer.Serialize(Model.TinhTrangItems.Select(x => x.Ten))),
+        colors: @Html.Raw(JsonSerializer.Serialize(Model.TinhTrangItems.Select(x => x.MauHex))),
+        chart: { type: 'donut', height: 190 },
+        legend: { show: false },
+        dataLabels: { enabled: false },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '72%',
+              labels: {
+                show: true,
+                name: { show: true, fontSize: '11px', color: '#94a3b8', offsetY: 14 },
+                value: { show: true, fontSize: '20px', fontWeight: 700, color: '#012970', offsetY: -12 },
+                total: { show: true, label: 'TỔNG TS', fontSize: '10px', color: '#94a3b8', formatter: () => '@Model.TongTaiSan' }
+              }
+            }
+          }
+        }
+      }).render();
+
+      new ApexCharts(document.querySelector("#phongBanDonut"), {
+        series: @Html.Raw(JsonSerializer.Serialize(Model.TaiSanTheoPhongBans.Select(x => x.SoLuong))),
+        labels: @Html.Raw(JsonSerializer.Serialize(Model.TaiSanTheoPhongBans.Select(x => x.TenPhongBan))),
+        colors: @Html.Raw(JsonSerializer.Serialize(Model.TaiSanTheoPhongBans.Select(x => x.MauHex))),
+        chart: { type: 'donut', height: 190 },
+        legend: { show: false },
+        dataLabels: { enabled: false },
+        plotOptions: {
+          pie: {
+            donut: {
+              size: '72%',
+              labels: {
+                show: true,
+                name: { show: true, fontSize: '11px', color: '#94a3b8', offsetY: 14 },
+                value: { show: true, fontSize: '20px', fontWeight: 700, color: '#012970', offsetY: -12 },
+                total: { show: true, label: 'ĐANG DÙNG', fontSize: '10px', color: '#94a3b8', formatter: () => '@tongTrongPhongBan' }
+              }
+            }
+          }
+        }
+      }).render();
+    });
+  </script>

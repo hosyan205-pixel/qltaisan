@@ -1,0 +1,169 @@
+@using DoAn.Areas.Admin.Models
+@model ThanhLyIndexViewModel
+
+@{
+    ViewData["Title"] = "Quản lý thanh lý tài sản";
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Quản lý thanh lý tài sản</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                <li class="breadcrumb-item active">Thanh lý tài sản</li>
+            </ol>
+        </nav>
+    </div>
+
+    @if (TempData["Success"] is string message)
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    @if (TempData["Error"] is string errorMsg)
+    {
+        <div class="alert alert-danger" role="alert">@errorMsg</div>
+    }
+
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h2 class="card-title mb-0">Danh sách phiếu thanh lý</h2>
+                    <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Create" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>Lập phiếu thanh lý
+                    </a>
+                </div>
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div asp-validation-summary="All" class="alert alert-danger py-2 mb-3"></div>
+                }
+
+                <form method="get" asp-area="Admin" asp-controller="ThanhLy" asp-action="Index" class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <label class="form-label">Từ khóa</label>
+                        <input type="text" name="keyword" value="@Model.Keyword" class="form-control" placeholder="Mã phiếu, lý do, mã/tên tài sản..." />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">Trạng thái</label>
+                        <select name="trangThai" class="form-select">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="@ThanhLyStates.ChoDuyet" selected="@(Model.TrangThai == ThanhLyStates.ChoDuyet)">@ThanhLyStates.Label(ThanhLyStates.ChoDuyet)</option>
+                            <option value="@ThanhLyStates.DaDuyet" selected="@(Model.TrangThai == ThanhLyStates.DaDuyet)">@ThanhLyStates.Label(ThanhLyStates.DaDuyet)</option>
+                            <option value="@ThanhLyStates.Huy" selected="@(Model.TrangThai == ThanhLyStates.Huy)">@ThanhLyStates.Label(ThanhLyStates.Huy)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Từ ngày</label>
+                        <input type="date" name="tuNgay" value="@Model.TuNgay?.ToString("yyyy-MM-dd")" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Đến ngày</label>
+                        <input type="date" name="denNgay" value="@Model.DenNgay?.ToString("yyyy-MM-dd")" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Sắp xếp</label>
+                        <select name="sort" class="form-select">
+                            <option value="date_desc" selected="@(Model.Sort == "date_desc")">Ngày mới nhất</option>
+                            <option value="date_asc" selected="@(Model.Sort == "date_asc")">Ngày cũ nhất</option>
+                            <option value="code_asc" selected="@(Model.Sort == "code_asc")">Mã phiếu A-Z</option>
+                            <option value="code_desc" selected="@(Model.Sort == "code_desc")">Mã phiếu Z-A</option>
+                            <option value="value_desc" selected="@(Model.Sort == "value_desc")">Giá trị cao nhất</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end gap-2">
+                        <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Index" class="btn btn-outline-secondary">Đặt lại</a>
+                    </div>
+                </form>
+
+                <div class="d-flex justify-content-between flex-wrap gap-2 mb-3">
+                    <span>
+                        <strong>@Model.Total</strong> phiếu thanh lý phù hợp
+                        <span class="text-muted ms-2">
+                            (Chờ duyệt: <strong>@Model.SoChoDuyet</strong> | Đã duyệt: <strong>@Model.SoDaDuyet</strong>)
+                        </span>
+                    </span>
+                    <span>Tổng giá trị đã thanh lý: <strong>@string.Format("{0:N0} đ", Model.TongGiaTriDaDuyet)</strong></span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Mã phiếu</th>
+                                <th>Ngày thanh lý</th>
+                                <th>Người lập</th>
+                                <th>Phương thức</th>
+                                <th class="text-center">Số tài sản</th>
+                                <th class="text-end">Tổng giá trị</th>
+                                <th>Trạng thái</th>
+                                <th class="text-nowrap">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Items.Any())
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-5">
+                                        Không tìm thấy phiếu thanh lý nào. Hãy lập phiếu mới hoặc thay đổi bộ lọc.
+                                    </td>
+                                </tr>
+                            }
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Details" asp-route-id="@item.Id">
+                                            <strong>@item.MaPhieu</strong>
+                                        </a>
+                                    </td>
+                                    <td>@(item.NgayThanhLy?.ToString("dd/MM/yyyy") ?? "-")</td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.NguoiLap) ? "-" : item.NguoiLap)</td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.PhuongThuc) ? "-" : item.PhuongThuc)</td>
+                                    <td class="text-center">@item.SoTaiSan</td>
+                                    <td class="text-end text-nowrap">@string.Format("{0:N0} đ", item.TongGiaTri)</td>
+                                    <td>
+                                        <span class="badge @ThanhLyStates.BadgeClass(item.TrangThai)">
+                                            @ThanhLyStates.Label(item.TrangThai)
+                                        </span>
+                                    </td>
+                                    <td class="text-nowrap">
+                                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Xem</a>
+                                        @if (item.TrangThai == ThanhLyStates.ChoDuyet)
+                                        {
+                                            <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                                        }
+                                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Print" asp-route-id="@item.Id" target="_blank" class="btn btn-sm btn-outline-dark">In</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="mt-3" aria-label="Phân trang phiếu thanh lý">
+                        <ul class="pagination pagination-sm justify-content-end mb-0">
+                            @for (int p = 1; p <= Model.TotalPages; p++)
+                            {
+                                <li class="page-item @(p == Model.Page ? "active" : "")">
+                                    <a class="page-link" asp-area="Admin" asp-controller="ThanhLy" asp-action="Index"
+                                       asp-route-keyword="@Model.Keyword"
+                                       asp-route-trangThai="@Model.TrangThai"
+                                       asp-route-tuNgay="@Model.TuNgay?.ToString("yyyy-MM-dd")"
+                                       asp-route-denNgay="@Model.DenNgay?.ToString("yyyy-MM-dd")"
+                                       asp-route-sort="@Model.Sort"
+                                       asp-route-pageSize="@Model.PageSize"
+                                       asp-route-page="@p">@p</a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                }
+            </div>
+        </div>
+    </section>
+</main>

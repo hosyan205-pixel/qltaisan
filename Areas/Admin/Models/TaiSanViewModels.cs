@@ -18,7 +18,7 @@ public class AssetFieldsViewModel : IValidatableObject
     [Display(Name = "Ngày mua"), DataType(DataType.Date)]
     public DateOnly? NgayMua { get; set; }
     [Display(Name = "Nguyên giá (VNĐ)"), Required(ErrorMessage = "Vui lòng nhập nguyên giá.")]
-    [Range(typeof(decimal), "0", "9999999999999.99", ErrorMessage = "Nguyên giá phải từ 0 đến 9.999.999.999.999,99.")]
+    [Range(typeof(decimal), "0", "9999999999999.99", ParseLimitsInInvariantCulture = true, ErrorMessage = "Nguyên giá phải từ 0 đến 9.999.999.999.999,99.")]
     public decimal? NguyenGia { get; set; }
     [Display(Name = "Hạn bảo hành"), DataType(DataType.Date)]
     public DateOnly? HanBaoHanh { get; set; }

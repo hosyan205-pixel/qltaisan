@@ -1,0 +1,251 @@
+@using System.Globalization
+@using System.Text.Json
+@using DoAn.Areas.Admin.Models
+@model ThanhLyFormViewModel
+
+@{
+    var isEdit = Model.Id.HasValue;
+    ViewData["Title"] = isEdit ? $"Sửa phiếu thanh lý {Model.MaPhieu}" : "Lập phiếu thanh lý tài sản";
+    var assetsJson = JsonSerializer.Serialize(Model.AvailableAssets);
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>@ViewData["Title"]</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="ThanhLy" asp-action="Index">Thanh lý tài sản</a></li>
+                <li class="breadcrumb-item active">@(isEdit ? "Chỉnh sửa" : "Lập phiếu")</li>
+            </ol>
+        </nav>
+    </div>
+
+    <section class="section">
+        <form asp-area="Admin" asp-controller="ThanhLy" asp-action="@(isEdit ? "Edit" : "Create")" asp-route-id="@Model.Id" method="post" id="thanhLyForm">
+            @Html.AntiForgeryToken()
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h2 class="card-title mb-0">Thông tin phiếu thanh lý</h2>
+                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Quay lại danh sách
+                        </a>
+                    </div>
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="All" class="alert alert-danger py-2 mb-3" role="alert"></div>
+                    }
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="MaPhieu" class="form-label">Mã phiếu <span class="text-danger">*</span></label>
+                            <input asp-for="MaPhieu" class="form-control" required maxlength="30" placeholder="VD: TL006" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="NgayThanhLy" class="form-label">Ngày thanh lý <span class="text-danger">*</span></label>
+                            <input type="date" name="NgayThanhLy" id="NgayThanhLy"
+                                   value="@Model.NgayThanhLy?.ToString("yyyy-MM-dd")"
+                                   class="form-control" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="PhuongThuc" class="form-label">Phương thức thanh lý</label>
+                            <input asp-for="PhuongThuc" list="phuongThucOptions" class="form-control" maxlength="100" placeholder="Chọn hoặc nhập phương thức..." />
+                            <datalist id="phuongThucOptions">
+                                <option value="Bán thanh lý"></option>
+                                <option value="Tiêu hủy"></option>
+                                <option value="Đấu giá"></option>
+                                <option value="Điều chuyển ngoài đơn vị"></option>
+                            </datalist>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="LyDo" class="form-label">Lý do thanh lý <span class="text-danger">*</span></label>
+                            <textarea asp-for="LyDo" class="form-control" rows="3" required maxlength="2000"
+                                      placeholder="VD: Tài sản hư hỏng không thể sửa chữa, hết thời gian sử dụng..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="GhiChu" class="form-label">Ghi chú</label>
+                            <textarea asp-for="GhiChu" class="form-control" rows="3" maxlength="4000"
+                                      placeholder="Ghi chú thêm (nếu có)..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h2 class="card-title mb-0">Danh sách tài sản thanh lý</h2>
+                        <span>Tổng giá trị thanh lý: <strong class="text-primary" id="totalValueDisplay">0 đ</strong></span>
+                    </div>
+
+                    @if (Model.AvailableAssets.Count == 0)
+                    {
+                        <div class="alert alert-info" role="status">
+                            Hiện không có tài sản nào đủ điều kiện thanh lý (chỉ chọn được tài sản đang quản lý, chưa cấp phát, không có phiếu bảo trì/kiểm kê hoặc phiếu thanh lý khác chưa hủy).
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-9">
+                                <label for="assetPicker" class="form-label">Chọn tài sản đủ điều kiện thêm vào phiếu</label>
+                                <select id="assetPicker" class="form-select">
+                                    <option value="">-- Chọn tài sản --</option>
+                                    @foreach (var a in Model.AvailableAssets)
+                                    {
+                                        <option value="@a.Id">@a.MaTaiSan - @a.TenTaiSan (@(a.DanhMuc ?? "Không danh mục") | @a.TinhTrang)</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="button" id="btnAddAsset" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-plus-circle me-1"></i>Thêm tài sản
+                                </button>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle" id="linesTable">
+                            <thead>
+                                <tr>
+                                    <th>Tài sản</th>
+                                    <th style="width: 210px;">Giá trị thanh lý (VNĐ)</th>
+                                    <th style="width: 200px;">Tình trạng</th>
+                                    <th>Ghi chú</th>
+                                    <th class="text-nowrap text-center" style="width: 90px;">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="linesBody">
+                                @for (int i = 0; i < Model.Lines.Count; i++)
+                                {
+                                    var line = Model.Lines[i];
+                                    var info = Model.AvailableAssets.FirstOrDefault(x => x.Id == line.TaiSanId);
+                                    <tr data-asset-id="@line.TaiSanId">
+                                        <td>
+                                            <input type="hidden" name="Lines[@i].TaiSanId" value="@line.TaiSanId" class="field-asset-id" />
+                                            <div><strong>@(info?.TenTaiSan ?? "Tài sản")</strong></div>
+                                            <small class="text-muted">
+                                                @(info?.MaTaiSan ?? "#" + line.TaiSanId)
+                                                @if (!string.IsNullOrWhiteSpace(info?.DanhMuc))
+                                                {
+                                                    @: • @info.DanhMuc
+                                                }
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <input type="number"
+                                                   name="Lines[@i].GiaTriThanhLy"
+                                                   value="@line.GiaTriThanhLy.ToString("0.##", CultureInfo.InvariantCulture)"
+                                                   min="0" step="1000"
+                                                   class="form-control text-end field-value" required />
+                                        </td>
+                                        <td>
+                                            <input type="text" name="Lines[@i].TinhTrang" value="@line.TinhTrang"
+                                                   maxlength="100" class="form-control field-condition" placeholder="VD: Hư hỏng, Cũ" />
+                                        </td>
+                                        <td>
+                                            <input type="text" name="Lines[@i].GhiChu" value="@line.GhiChu"
+                                                   maxlength="2000" class="form-control field-note" placeholder="Ghi chú..." />
+                                        </td>
+                                        <td class="text-center text-nowrap">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-remove-row">Xóa</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div id="emptyLinesNotice" class="text-center text-muted py-4 @(Model.Lines.Count > 0 ? "d-none" : "")">
+                            Chưa có tài sản nào được chọn. Hãy chọn tài sản ở phía trên và bấm "Thêm tài sản".
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Index" class="btn btn-outline-secondary">Hủy bỏ</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i>@(isEdit ? "Lưu thay đổi" : "Tạo phiếu thanh lý")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
+
+<script>
+    (function () {
+        const assets = @Html.Raw(assetsJson);
+        const assetMap = new Map(assets.map(a => [a.Id, a]));
+        const picker = document.getElementById('assetPicker');
+        const addBtn = document.getElementById('btnAddAsset');
+        const tbody = document.getElementById('linesBody');
+        const totalEl = document.getElementById('totalValueDisplay');
+        const emptyNotice = document.getElementById('emptyLinesNotice');
+
+        function reindexAndCalc() {
+            let total = 0;
+            const rows = tbody.querySelectorAll('tr');
+            rows.forEach((tr, idx) => {
+                tr.querySelector('.field-asset-id').name = `Lines[${idx}].TaiSanId`;
+                const valInput = tr.querySelector('.field-value');
+                valInput.name = `Lines[${idx}].GiaTriThanhLy`;
+                tr.querySelector('.field-condition').name = `Lines[${idx}].TinhTrang`;
+                tr.querySelector('.field-note').name = `Lines[${idx}].GhiChu`;
+                const num = parseFloat(valInput.value);
+                if (!isNaN(num) && num > 0) total += num;
+            });
+            totalEl.textContent = Math.round(total).toLocaleString('vi-VN') + ' đ';
+            if (emptyNotice) emptyNotice.classList.toggle('d-none', rows.length > 0);
+        }
+
+        if (addBtn && picker) {
+            addBtn.addEventListener('click', function () {
+                const id = parseInt(picker.value, 10);
+                if (!id) return;
+                if (tbody.querySelector(`tr[data-asset-id="${id}"]`)) {
+                    alert('Tài sản này đã có trong phiếu.');
+                    return;
+                }
+                const a = assetMap.get(id);
+                if (!a) return;
+
+                const tr = document.createElement('tr');
+                tr.dataset.assetId = id;
+                tr.innerHTML = `
+                    <td>
+                        <input type="hidden" class="field-asset-id" value="${a.Id}" />
+                        <div><strong class="asset-name"></strong></div>
+                        <small class="text-muted asset-meta"></small>
+                    </td>
+                    <td><input type="number" min="0" step="1000" value="0" class="form-control text-end field-value" required /></td>
+                    <td><input type="text" maxlength="100" class="form-control field-condition" placeholder="VD: Hư hỏng, Cũ" /></td>
+                    <td><input type="text" maxlength="2000" class="form-control field-note" placeholder="Ghi chú..." /></td>
+                    <td class="text-center text-nowrap"><button type="button" class="btn btn-sm btn-outline-danger btn-remove-row">Xóa</button></td>
+                `;
+                tr.querySelector('.asset-name').textContent = a.TenTaiSan;
+                tr.querySelector('.asset-meta').textContent = a.DanhMuc ? `${a.MaTaiSan} • ${a.DanhMuc}` : a.MaTaiSan;
+                tr.querySelector('.field-condition').value = a.TinhTrang || '';
+                tbody.appendChild(tr);
+                picker.value = '';
+                reindexAndCalc();
+            });
+        }
+
+        tbody.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-remove-row');
+            if (btn) {
+                btn.closest('tr').remove();
+                reindexAndCalc();
+            }
+        });
+
+        tbody.addEventListener('input', function (e) {
+            if (e.target.classList.contains('field-value')) reindexAndCalc();
+        });
+
+        reindexAndCalc();
+    })();
+</script>

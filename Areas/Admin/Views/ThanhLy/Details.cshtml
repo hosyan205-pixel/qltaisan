@@ -1,0 +1,173 @@
+@using DoAn.Areas.Admin.Models
+@model ThanhLyDetailsViewModel
+
+@{
+    ViewData["Title"] = $"Chi tiết phiếu thanh lý {Model.Phieu.MaPhieu}";
+    var isPending = Model.Phieu.TrangThai == ThanhLyStates.ChoDuyet;
+}
+
+<main id="main" class="main">
+    <div class="pagetitle">
+        <h1>Chi tiết phiếu thanh lý</h1>
+        <nav>
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="ThanhLy" asp-action="Index">Thanh lý tài sản</a></li>
+                <li class="breadcrumb-item active">@Model.Phieu.MaPhieu</li>
+            </ol>
+        </nav>
+    </div>
+
+    @if (TempData["Success"] is string message)
+    {
+        <div class="alert alert-success" role="status">@message</div>
+    }
+    @if (TempData["Error"] is string errorMsg)
+    {
+        <div class="alert alert-danger" role="alert">@errorMsg</div>
+    }
+
+    <section class="section">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <h2 class="card-title mb-0">Phiếu @Model.Phieu.MaPhieu</h2>
+                        <span class="badge @ThanhLyStates.BadgeClass(Model.Phieu.TrangThai)">
+                            @ThanhLyStates.Label(Model.Phieu.TrangThai)
+                        </span>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        @if (isPending)
+                        {
+                            <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Edit" asp-route-id="@Model.Phieu.Id" class="btn btn-outline-secondary">
+                                <i class="bi bi-pencil me-1"></i>Sửa phiếu
+                            </a>
+                            <form asp-area="Admin" asp-controller="ThanhLy" asp-action="Approve" asp-route-id="@Model.Phieu.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Xác nhận duyệt phiếu thanh lý này? Trạng thái các tài sản trong phiếu sẽ chuyển sang Đã thanh lý và ngừng quản lý.');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-check-circle me-1"></i>Duyệt thanh lý
+                                </button>
+                            </form>
+                        }
+                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Print" asp-route-id="@Model.Phieu.Id" target="_blank" class="btn btn-outline-dark">
+                            <i class="bi bi-printer me-1"></i>In biên bản
+                        </a>
+                        <a asp-area="Admin" asp-controller="ThanhLy" asp-action="Index" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left me-1"></i>Quay lại
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="text-muted small">Mã phiếu</div>
+                        <div class="fw-semibold">@Model.Phieu.MaPhieu</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-muted small">Ngày thanh lý</div>
+                        <div class="fw-semibold">@(Model.Phieu.NgayThanhLy?.ToString("dd/MM/yyyy") ?? "-")</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-muted small">Người lập phiếu</div>
+                        <div class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.Phieu.NguoiLap) ? "-" : Model.Phieu.NguoiLap)</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-muted small">Phương thức thanh lý</div>
+                        <div class="fw-semibold">@(string.IsNullOrWhiteSpace(Model.Phieu.PhuongThuc) ? "-" : Model.Phieu.PhuongThuc)</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-muted small">Số lượng tài sản</div>
+                        <div class="fw-semibold">@Model.Items.Count</div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-muted small">Tổng giá trị thanh lý</div>
+                        <div class="fw-bold text-primary">@string.Format("{0:N0} đ", Model.Phieu.TongGiaTri)</div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="text-muted small">Lý do thanh lý</div>
+                        <div>@(string.IsNullOrWhiteSpace(Model.Phieu.LyDo) ? "-" : Model.Phieu.LyDo)</div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Phieu.GhiChu))
+                    {
+                        <div class="col-md-12">
+                            <div class="text-muted small">Ghi chú</div>
+                            <div style="white-space: pre-line;">@Model.Phieu.GhiChu</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <h2 class="card-title mb-0">Danh sách tài sản trong phiếu</h2>
+                    <span>Tổng cộng: <strong>@string.Format("{0:N0} đ", Model.Phieu.TongGiaTri)</strong></span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">STT</th>
+                                <th>Tài sản</th>
+                                <th>Danh mục</th>
+                                <th>Tình trạng thanh lý</th>
+                                <th class="text-end">Giá trị thanh lý</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.Items.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">Phiếu chưa có danh sách tài sản.</td>
+                                </tr>
+                            }
+                            @for (int i = 0; i < Model.Items.Count; i++)
+                            {
+                                var item = Model.Items[i];
+                                <tr>
+                                    <td>@(i + 1)</td>
+                                    <td>
+                                        <div><strong>@item.TenTaiSan</strong></div>
+                                        <small class="text-muted">@item.MaTaiSan</small>
+                                    </td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.DanhMuc) ? "-" : item.DanhMuc)</td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.TinhTrangThanhLy) ? "-" : item.TinhTrangThanhLy)</td>
+                                    <td class="text-end text-nowrap">@string.Format("{0:N0} đ", item.GiaTriThanhLy)</td>
+                                    <td>@(string.IsNullOrWhiteSpace(item.GhiChu) ? "-" : item.GhiChu)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        @if (isPending)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-danger">Hủy phiếu thanh lý</h2>
+                    <form asp-area="Admin" asp-controller="ThanhLy" asp-action="Cancel" asp-route-id="@Model.Phieu.Id" method="post" class="row g-3"
+                          onsubmit="return confirm('Xác nhận hủy phiếu thanh lý này?');">
+                        @Html.AntiForgeryToken()
+                        <div class="col-md-9">
+                            <label for="lyDoHuy" class="form-label">Lý do hủy phiếu <span class="text-danger">*</span></label>
+                            <input type="text" id="lyDoHuy" name="lyDoHuy" class="form-control"
+                                   placeholder="Nhập lý do hủy phiếu thanh lý..." required maxlength="1000" />
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-outline-danger w-100">
+                                <i class="bi bi-x-circle me-1"></i>Xác nhận hủy phiếu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        }
+    </section>
+</main>

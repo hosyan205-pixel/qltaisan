@@ -1,0 +1,81 @@
+@using DoAn.Areas.Admin.Models
+@model ThanhLyDetailsViewModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Biên bản thanh lý - @Model.Phieu.MaPhieu</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+        body { font-family: "Times New Roman", serif; font-size: 14px; color: #000; }
+        @@media print { .no-print { display: none !important; } }
+    </style>
+</head>
+<body class="p-4">
+    <div class="no-print mb-3 d-flex justify-content-end gap-2">
+        <button onclick="window.print()" class="btn btn-primary btn-sm">In biên bản</button>
+        <button onclick="window.close()" class="btn btn-secondary btn-sm">Đóng</button>
+    </div>
+
+    <div class="container">
+        <div class="text-center mb-4">
+            <h4 class="fw-bold text-uppercase mb-1">Biên bản thanh lý tài sản</h4>
+            <div>Mã phiếu: <strong>@Model.Phieu.MaPhieu</strong> — Ngày: @(Model.Phieu.NgayThanhLy?.ToString("dd/MM/yyyy") ?? "-")</div>
+        </div>
+
+        <div class="mb-3">
+            <div><strong>Người lập phiếu:</strong> @(Model.Phieu.NguoiLap ?? "-")</div>
+            <div><strong>Phương thức thanh lý:</strong> @(Model.Phieu.PhuongThuc ?? "-")</div>
+            <div><strong>Trạng thái:</strong> @ThanhLyStates.Label(Model.Phieu.TrangThai)</div>
+            <div><strong>Lý do thanh lý:</strong> @(Model.Phieu.LyDo ?? "-")</div>
+        </div>
+
+        <table class="table table-bordered border-dark table-sm">
+            <thead>
+                <tr class="text-center">
+                    <th style="width: 50px;">STT</th>
+                    <th>Mã tài sản</th>
+                    <th>Tên tài sản</th>
+                    <th>Danh mục</th>
+                    <th>Tình trạng</th>
+                    <th class="text-end">Giá trị thanh lý (VNĐ)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    var item = Model.Items[i];
+                    <tr>
+                        <td class="text-center">@(i + 1)</td>
+                        <td>@item.MaTaiSan</td>
+                        <td>@item.TenTaiSan</td>
+                        <td>@(item.DanhMuc ?? "-")</td>
+                        <td>@(item.TinhTrangThanhLy ?? "-")</td>
+                        <td class="text-end">@item.GiaTriThanhLy.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="text-end fw-bold">Tổng giá trị thanh lý:</td>
+                    <td class="text-end fw-bold">@Model.Phieu.TongGiaTri.ToString("N0")</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="row text-center mt-5">
+            <div class="col-6">
+                <strong>Người lập phiếu</strong>
+                <div class="text-muted small">(Ký, ghi rõ họ tên)</div>
+            </div>
+            <div class="col-6">
+                <strong>Thủ trưởng đơn vị duyệt</strong>
+                <div class="text-muted small">(Ký, đóng dấu)</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
